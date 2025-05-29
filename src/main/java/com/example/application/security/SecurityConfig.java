@@ -10,9 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
+//сюди просто не лізье плз
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
@@ -21,18 +23,28 @@ public class SecurityConfig extends VaadinWebSecurity {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth ->
                 auth.requestMatchers(
-                    AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/images/*.png")).permitAll());
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/images/*.png"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/icons/*.png")
+                ).permitAll());
+
         super.configure(http);
+
         setLoginView(http, LoginView.class);
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public UserDetailsService users() {
         UserDetails admin = User.builder()
-                .username("admin")
-                .password("{noop}cisco")
-                .roles("USER", "ADMIN")
+                .username("cyberanalyst")
+                .password(passwordEncoder().encode("cisco"))
+                .roles("ADMIN")
                 .build();
+
         return new InMemoryUserDetailsManager(admin);
     }
 }

@@ -1,0 +1,45 @@
+:root {
+    --lumo-primary-color: #ff9100;
+    --lumo-primary-color-50pct: rgba(255, 136, 0, 0.5);
+    --lumo-primary-color-10pct: rgba(85, 64, 42, 0.1);
+
+    --lumo-primary-text-color: #ff9100;
+    --lumo-link-color: #ff9100;
+    --lumo-focus-color: #ff9100;
+
+    --lumo-secondary-color: #7C3AED;
+    --lumo-secondary-color-50pct: rgba(124, 58, 237, 0.5);
+    --lumo-secondary-color-10pct: rgba(124, 58, 237, 0.1);
+}
+
+.banner {
+    overflow: hidden;
+    display: inline-block;
+    border-right: 0.15em solid orange;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    max-width: 30ch;
+
+    animation:
+            typing 3.5s steps(40, end) forwards,
+            blink-caret 0.75s step-end 4,
+            remove-caret 3.5s forwards;
+}
+
+/* Ефект друку */
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+/* Блимання курсора */
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: orange; }
+}
+
+/* Зникнення курсора після анімації */
+@keyframes remove-caret {
+    from { border-right-color: orange; }
+    to { border-right: transparent; } /* або none, якщо хочеш повністю */
+}
