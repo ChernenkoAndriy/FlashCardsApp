@@ -42,8 +42,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 		loginForm.setForgotPasswordButtonVisible(false);
 		logoImage = new Image("icons/Icon.png", "Sleeve icon");
 
-		signUpLink = new RouterLink("Create an account", SignUpView.class);
-		forgotPasswordLink = new RouterLink("Forgot password?", ForgotPasswordView.class);
+	//	signUpLink = new RouterLink("Create an account", MainView.class);
+	//	forgotPasswordLink = new RouterLink("Forgot password?", MainView.class);
 	}
 
 	// Побудова сторінки: стилізація і додавання компонентів у вертикальний лейаут
@@ -53,7 +53,8 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 		setAlignItems(Alignment.CENTER);
 		setJustifyContentMode(JustifyContentMode.CENTER);
 		logoImage.setHeight("100px");
-		add(logoImage, loginForm, signUpLink, forgotPasswordLink);
+		add(logoImage, loginForm);
+		//add(signUpLink, forgotPasswordLink);
 	}
 
 	// Метод викликається перед тим, як користувач зайде на сторінку
