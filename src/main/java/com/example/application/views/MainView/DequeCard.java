@@ -1,0 +1,93 @@
+package com.example.application.views.MainView;
+
+import com.vaadin.flow.component.card.Card;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H5;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
+
+public class DequeCard extends Card {
+    private final H3 name = new H3();
+    private final ProgressBar progressBar = new ProgressBar();
+    private final H5 size = new H5("Size: 0");
+    private final H5 mainLanguage = new H5("Language: English");
+    private final H5 translationLanguage = new H5("Translation: Ukrainian");
+    public DequeCard(String title) {
+        name.setText(title);
+
+        VerticalLayout left = createLeftLayout();
+        VerticalLayout center = createCenterLayout();
+        VerticalLayout right = createRightLayout();
+
+        HorizontalLayout layout = new HorizontalLayout(left, center, right);
+        configureMainLayout(layout);
+
+        add(layout);
+
+        applyCardStyles();
+        applyTextColors();
+    }
+    private VerticalLayout createLeftLayout() {
+        VerticalLayout left = new VerticalLayout(name);
+        left.setPadding(false);
+        left.setSpacing(false);
+        left.setWidthFull();
+        return left;
+    }
+    private VerticalLayout createCenterLayout() {
+        VerticalLayout center = new VerticalLayout(progressBar);
+        center.setPadding(false);
+        center.setSpacing(false);
+        progressBar.setWidth("100%");
+        progressBar.setValue(0.55);
+        progressBar.getStyle()
+                .set("background-color", "white")
+                .set("border", "2px solid #ffffff")
+                .set("border-radius", "10px");
+        progressBar.setIndeterminate(false);
+        progressBar.setHeight("10px");
+        progressBar.addClassName("opaque-progress");
+        return center;
+    }
+    private VerticalLayout createRightLayout() {
+        VerticalLayout right = new VerticalLayout(mainLanguage, translationLanguage, size);
+        right.setPadding(false);
+        right.setSpacing(true);
+        right.setAlignItems(FlexComponent.Alignment.END);
+        return right;
+    }
+    private void configureMainLayout(HorizontalLayout layout) {
+        layout.setWidthFull();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        layout.setPadding(true);
+        layout.setSpacing(true);
+    }
+    private void applyCardStyles() {
+        addClassName("deque-ui");
+        setWidthFull();
+        getStyle()
+                .set("padding", "1rem")
+                .set("margin", "1rem");
+    }
+    private void applyTextColors() {
+        name.getStyle().set("color", "white");
+        size.getStyle().set("color", "white");
+        mainLanguage.getStyle().set("color", "white");
+        translationLanguage.getStyle().set("color", "white");
+    }
+    public void setSizeText(String value) {
+        size.setText("Size: " + value);
+    }
+    public void setMainLanguage(String lang) {
+        mainLanguage.setText("Main: " + lang);
+    }
+    public void setTranslationLanguage(String lang) {
+        translationLanguage.setText("Translation: " + lang);
+    }
+    public void setProgress(double value) {
+        progressBar.setValue(value);
+    }
+}

@@ -8,8 +8,32 @@
     --lumo-focus-color: #ff9100;
 
     --lumo-secondary-color: #7C3AED;
-    --lumo-secondary-color-50pct: rgba(124, 58, 237, 0.5);
-    --lumo-secondary-color-10pct: rgba(124, 58, 237, 0.1);
+    --lumo-secondary-color-50pct: #7C3AED80; /* rgba(124, 58, 237, 0.5) */
+    --lumo-secondary-color-10pct: #7C3AED1A; /* rgba(124, 58, 237, 0.1) */
+}
+
+[theme~="dark"] {
+    --lumo-primary-color: #ff9100;
+    --lumo-primary-color-50pct: rgba(255, 136, 0, 0.5);
+    --lumo-primary-color-10pct: rgba(85, 64, 42, 0.1);
+
+    --lumo-primary-text-color: #ff9100;
+    --lumo-link-color: #ff9100;
+    --lumo-focus-color: #ff9100;
+
+    --lumo-secondary-color: #7C3AED;
+    --lumo-secondary-color-50pct: #7C3AED80;
+    --lumo-secondary-color-10pct: #7C3AED1A;
+}
+
+:host([theme~="dark"]) vaadin-button,
+vaadin-button {
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+vaadin-button:hover {
+    transform: scale(1.05) translateY(-2px);
+    filter: brightness(0.9);
 }
 
 .banner {
@@ -43,3 +67,33 @@
     from { border-right-color: orange; }
     to { border-right: transparent; } /* або none, якщо хочеш повністю */
 }
+
+.deque-ui {
+    background-color: #7C3AED; /* світло-фіолетовий */
+    color: white;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.deque-ui:hover {
+    background-color: #6829c2; /* темніший фіолетовий при наведенні */
+    transform: scale(1.03) translateY(-4px);
+}
+
+.deque-ui:active {
+    background-color: #511a99; /* ще темніший фіолетовий при натисканні */
+    transform: scale(0.99) translateY(-2px);
+}
+
+.opaque-progress {
+    opacity: 1 !important;
+}
+
+.opaque-progress vaadin-progress-bar {
+    opacity: 1 !important;
+}
+
+
+
+
+
