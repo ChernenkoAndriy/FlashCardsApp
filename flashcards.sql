@@ -1,6 +1,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
-
+DELIMITER //
 
 CREATE TABLE IF NOT EXISTS `user`
 (
@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS `user`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   AUTO_INCREMENT = 1;
-
 
 INSERT INTO `user` (`username`, `email`, `password`, `language`)
 VALUES ('admin', 'admin@gmail.com', 'admin777', 'Ukrainian');
@@ -45,7 +44,6 @@ CREATE TABLE IF NOT EXISTS `deck`
   DEFAULT CHARSET = utf8mb4
   AUTO_INCREMENT = 1;
 
-
 INSERT INTO `deck` (`name`, `language_id`, `is_active`)
 VALUES ('TEST', 1, 1);
 
@@ -54,7 +52,7 @@ CREATE TABLE IF NOT EXISTS `card`
     `id`         int(11)     NOT NULL AUTO_INCREMENT,
     `word`       varchar(50) NOT NULL,
     `translate`  varchar(50) NOT NULL,
-    `definition` varchar(100)         DEFAULT NULL,
+    `definition` varchar(100)         DEFAULT NOT NULL,
     `image`      varchar(255)         DEFAULT NULL,
     `is_learned` bool        NOT NULL DEFAULT 0,
     `deck_id`    int(11)     NOT NULL,
@@ -68,15 +66,14 @@ INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `is_learned`, `d
 VALUES ('test', 'тест', 'a procedure intended to establish the quality, performance, or reliability of something', NULL,
         0, 1);
 
-
 CREATE TABLE IF NOT EXISTS `user_progress`
 (
     `id`         int(11)                                       NOT NULL AUTO_INCREMENT,
     `user_id`    int(11)                                       NOT NULL,
     `card_id`    int(11)                                       NOT NULL,
-    `period`     enum ('learning', 'first', 'second', 'third') NOT NULL DEFAULT 'new',
+    `period`     enum ('learning', 'first', 'second', 'third') NOT NULL DEFAULT 'learning',
     `is_correct` bool                                          NOT NULL DEFAULT 0,
-    date         datetime                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `date`       datetime                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`card_id`) REFERENCES `card` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -87,7 +84,6 @@ CREATE TABLE IF NOT EXISTS `user_progress`
 INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`)
 VALUES (1, 1, 'learning', 0);
 
-
 CREATE TRIGGER `update_deck_cards_number`
     AFTER INSERT
     ON `card`
@@ -96,4 +92,17 @@ BEGIN
     UPDATE `deck`
     SET `cards_number` = `cards_number` + 1
     WHERE `id` = NEW.`deck_id`;
-END;
+END//
+
+CREATE TRIGGER `decrement_deck_cards_number`
+    AFTER DELETE
+    ON `card`
+    FOR EACH ROW
+BEGIN
+    UPDATE `deck`
+    SET `cards_number` = `cards_number` - 1
+    WHERE `id` = OLD.`deck_id`;
+END//
+
+
+DELIMITER ;
