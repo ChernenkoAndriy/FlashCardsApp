@@ -49,13 +49,13 @@ VALUES ('TEST', 1, 1);
 
 CREATE TABLE IF NOT EXISTS `card`
 (
-    `id`         int(11)     NOT NULL AUTO_INCREMENT,
-    `word`       varchar(50) NOT NULL,
-    `translate`  varchar(50) NOT NULL,
-    `definition` varchar(100)         DEFAULT NOT NULL,
-    `image`      varchar(255)         DEFAULT NULL,
-    `is_learned` bool        NOT NULL DEFAULT 0,
-    `deck_id`    int(11)     NOT NULL,
+    `id`         int(11)      NOT NULL AUTO_INCREMENT,
+    `word`       varchar(50)  NOT NULL,
+    `translate`  varchar(50)  NOT NULL,
+    `definition` varchar(100) NOT NULL,
+    `image`      varchar(255) NULL,
+    `is_learned` bool         NOT NULL DEFAULT 0,
+    `deck_id`    int(11)      NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`deck_id`) REFERENCES `deck` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB

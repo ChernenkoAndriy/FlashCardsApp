@@ -14,7 +14,7 @@ public class Deck {
     @Column(name = "`name`", nullable = false)
     private String name;
 
-    @Column(name ="`cards_number", nullable = false)
+    @Column(name ="`cards_number`", nullable = false)
     private int cardsNumber;
 
     @Column(name = "`is_active`", nullable = false)
