@@ -1,9 +1,6 @@
 package com.example.application.views.MainView;
 
 import com.example.application.views.Components.MainLayout;
-import com.example.application.views.MainView.Buttons.DeleteButton;
-import com.example.application.views.MainView.Buttons.EditButton;
-import com.example.application.views.MainView.Buttons.PlayButton;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
@@ -19,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @RolesAllowed({"ADMIN", "USER"})
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Home | SLEEVE")
@@ -26,9 +24,17 @@ public class MainView extends VerticalLayout {
 
     private H1 greeting;
     private H2 allDecksTitle;
+    //кнопка для створення колод
     private Button createDeckButton;
-    private Map<String, List<DequeCard>> decksByLanguage;
+    //якщо коротко то це ui компонент, який організовує вкладки, в які можна пхати ряди з деками, або що завгодно
     private Accordion decksAccordion;
+
+    //це потрібно чисто для прикладу щоб наповнити сторінку, але подібну структуру можна використати і з сервісом
+    //це хешмап типу (мова -> список колод по всій мові)
+    //можна спробувати написати спосіб отримання подібної мапи з бази і буде метод для відображення цього
+    private Map<String, List<DequeCard>> decksByLanguage;
+
+//варто додати через ін'єкцію сервіс, і використовувати його як поле сторінки
     public MainView() {
         initialiseComponents();
         configureStyles();
@@ -38,6 +44,7 @@ public class MainView extends VerticalLayout {
 
         add(greeting, createHeaderLayout(), createButtonLayout(), decksAccordion);
     }
+    //ось типу наповнення колекцій
     private void configureData() {
         decksByLanguage.put("English", new ArrayList<>());
         decksByLanguage.put("Ukrainian", new ArrayList<>());
@@ -49,6 +56,8 @@ public class MainView extends VerticalLayout {
             decksByLanguage.get("German").add(new DequeCard("German Deck " + i));
         }
     }
+    //ось метод для відображення таких речей
+
     private void configureDeckLists() {
         for (Map.Entry<String, List<DequeCard>> entry : decksByLanguage.entrySet()) {
             String language = entry.getKey();
@@ -60,20 +69,10 @@ public class MainView extends VerticalLayout {
             listLayout.setWidthFull();
 
             for (DequeCard dequeCard : languageDecks) {
-                HorizontalLayout layout = new HorizontalLayout();
-                layout.setWidthFull();
-                layout.setAlignItems(Alignment.CENTER);
-
-                dequeCard.setWidth("60%");
-                layout.add(dequeCard);
-
-                Button deleteButton = new DeleteButton();
-                Button editButton = new EditButton();
-                Button playButton = new PlayButton();
-
-                layout.addToEnd(deleteButton, editButton, playButton);
-
-                listLayout.add(layout);
+                //було б непогано якщо в конструктор deckrow передавалась дека а не готова картка, і компонент автоматично ініціалізувався
+                //також треба зробити назначення дій на кнопки, було б добре передати їх лямбдою
+                DequeRow row = new DequeRow(dequeCard);
+                listLayout.add(row);
             }
 
             VerticalLayout wrapper = new VerticalLayout(listLayout);
@@ -81,12 +80,9 @@ public class MainView extends VerticalLayout {
             wrapper.setSpacing(false);
 
             var panel = decksAccordion.add(language, wrapper);
-            panel.getElement()
-                    .getStyle()
-                    .set("min-height", "4rem");
+            panel.getElement().getStyle().set("min-height", "4rem");
         }
     }
-
 
     private void initialiseComponents() {
         greeting = new H1("Welcome! Let`s learn some words!");
@@ -95,23 +91,18 @@ public class MainView extends VerticalLayout {
         decksByLanguage = new HashMap<>();
         decksAccordion = new Accordion();
     }
+
+    //ОСЬ ВСЕ ЩО ДАЛІ ЦЕ ТУПО СТИЛІЗАЦІЯ ЗОВНІШНЬОГО ВИГЛЯДУ, ТУДИ МОЖНА НЕ ЛІЗТИ
     private void configureStyles() {
-        // Greeting style
         greeting.addClassName("banner");
         greeting.getStyle().set("font-size", "300%");
         greeting.getStyle().set("margin", "3rem");
-
-        // allDecksTitle style
         allDecksTitle.getStyle().set("margin", "0");
-
-        // Create deck button style
         createDeckButton.getStyle().set("font-size", "1.2rem");
         createDeckButton.addThemeName("primary");
         createDeckButton.setWidth("auto");
         createDeckButton.setHeight("100%");
-        createDeckButton.getStyle().setMargin("0");
-
-        // Accordion width
+        createDeckButton.getStyle().set("margin", "0");
         decksAccordion.setWidth("90%");
     }
     private void configureLayouts() {
@@ -135,11 +126,10 @@ public class MainView extends VerticalLayout {
         buttonLayout.setAlignItems(Alignment.START);
         buttonLayout.getStyle()
                 .set("width", "90%")
-                .setMarginLeft("4rem");
+                .set("margin-left", "4rem");
         buttonLayout.setPadding(false);
         buttonLayout.setMargin(false);
         buttonLayout.getStyle().set("margin", "1rem 0");
         return buttonLayout;
     }
-
 }

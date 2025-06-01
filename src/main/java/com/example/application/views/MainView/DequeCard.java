@@ -7,13 +7,13 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
-
+//тут треба зробити щоб клас створювався від об'єкту деки і все
+//він наслідується від ваадін картки і показує на сторінці фіолетовий квадрат з декою
 public class DequeCard extends Card {
     private final H3 name = new H3();
     private final ProgressBar progressBar = new ProgressBar();
     private final H5 size = new H5("Size: 0");
     private final H5 mainLanguage = new H5("Language: English");
-    private final H5 translationLanguage = new H5("Translation: Ukrainian");
     public DequeCard(String title) {
         name.setText(title);
 
@@ -52,7 +52,7 @@ public class DequeCard extends Card {
         return center;
     }
     private VerticalLayout createRightLayout() {
-        VerticalLayout right = new VerticalLayout(mainLanguage, translationLanguage, size);
+        VerticalLayout right = new VerticalLayout(mainLanguage,  size);
         right.setPadding(false);
         right.setSpacing(true);
         right.setAlignItems(FlexComponent.Alignment.END);
@@ -76,16 +76,12 @@ public class DequeCard extends Card {
         name.getStyle().set("color", "white");
         size.getStyle().set("color", "white");
         mainLanguage.getStyle().set("color", "white");
-        translationLanguage.getStyle().set("color", "white");
     }
     public void setSizeText(String value) {
         size.setText("Size: " + value);
     }
     public void setMainLanguage(String lang) {
         mainLanguage.setText("Main: " + lang);
-    }
-    public void setTranslationLanguage(String lang) {
-        translationLanguage.setText("Translation: " + lang);
     }
     public void setProgress(double value) {
         progressBar.setValue(value);
