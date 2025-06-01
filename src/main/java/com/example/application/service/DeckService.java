@@ -21,9 +21,14 @@ public class DeckService {
         return deckRepository.findAll();
     }
 
+    public List<Deck> findActiveByLanguageId(Long languageId) {
+        return deckRepository.findByLanguageIdAndIsActiveTrue(languageId);
+    }
+
     public void save(Deck deck) {
         deckRepository.save(deck);
     }
+
     public void delete(Deck deck) {
         deckRepository.delete(deck);
     }

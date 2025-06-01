@@ -23,18 +23,14 @@ public class Card {
     @Column(name = "`image`", nullable = true)
     private String image;
 
-    @Column(name = "`is_learned`", nullable = false)
-    private boolean isLearned;
-
     @Column(name = "`deck_id`", nullable = false)
     private Long deckId;
 
-    public Card(String word, String translate, String definition, String image, boolean isLearned, Long deckId) {
+    public Card(String word, String translate, String definition, String image, Long deckId) {
         this.word = word;
         this.translate = translate;
         this.definition = definition;
         this.image = image;
-        this.isLearned = isLearned;
         this.deckId = deckId;
     }
 
@@ -80,14 +76,6 @@ public class Card {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public boolean isLearned() {
-        return isLearned;
-    }
-
-    public void setLearned(boolean learned) {
-        isLearned = learned;
     }
 
     public Long getDeckId() {

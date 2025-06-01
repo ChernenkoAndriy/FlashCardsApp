@@ -54,7 +54,6 @@ CREATE TABLE IF NOT EXISTS `card`
     `translate`  varchar(50)  NOT NULL,
     `definition` varchar(100) NOT NULL,
     `image`      varchar(255) NULL,
-    `is_learned` bool         NOT NULL DEFAULT 0,
     `deck_id`    int(11)      NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`deck_id`) REFERENCES `deck` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -68,12 +67,14 @@ VALUES ('test', 'тест', 'a procedure intended to establish the quality, perf
 
 CREATE TABLE IF NOT EXISTS `user_progress`
 (
-    `id`         int(11)                                       NOT NULL AUTO_INCREMENT,
-    `user_id`    int(11)                                       NOT NULL,
-    `card_id`    int(11)                                       NOT NULL,
-    `period`     enum ('learning', 'first', 'second', 'third') NOT NULL DEFAULT 'learning',
-    `is_correct` bool                                          NOT NULL DEFAULT 0,
-    `date`       datetime                                      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id`         int(11)                                                    NOT NULL AUTO_INCREMENT,
+    `user_id`    int(11)                                                    NOT NULL,
+    `card_id`    int(11)                                                    NOT NULL,
+    `period`     enum ('created','learning', 'first', 'second', 'third')    NOT NULL DEFAULT 'created',
+    `is_correct` bool                                                       NOT NULL DEFAULT 0,
+    `date`       datetime                                                   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `next_date`  datetime                                                   NULL,
+    `is_learned` bool                                                       NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`card_id`) REFERENCES `card` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
