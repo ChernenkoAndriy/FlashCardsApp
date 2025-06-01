@@ -29,4 +29,8 @@ public class CardService {
     public void delete(Card card) {
         cardRepository.delete(card);
     }
+
+    public void update(Card card) {
+        //TODO update method
+    }
 }
