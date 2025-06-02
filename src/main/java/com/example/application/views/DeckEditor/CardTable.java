@@ -1,4 +1,4 @@
-package com.example.application.views.DeckEditorView;
+package com.example.application.views.DeckEditor;
 
 import com.example.application.data.Card;
 import com.vaadin.flow.component.grid.Grid;

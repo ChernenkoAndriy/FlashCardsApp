@@ -1,4 +1,4 @@
-package com.example.application.views.DeckEditorView;
+package com.example.application.views.DeckEditor;
 
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;

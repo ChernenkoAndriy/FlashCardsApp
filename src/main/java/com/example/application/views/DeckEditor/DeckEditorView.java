@@ -1,4 +1,4 @@
-package com.example.application.views.DeckEditorView;
+package com.example.application.views.DeckEditor;
 
 import com.example.application.data.Card;
 import com.example.application.service.CardService;
@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 @Route(value = "editor", layout = MainLayout.class)
 @PageTitle("DeckEditor | SLEEVE")
 public class DeckEditorView extends VerticalLayout {
-
     private final DeckHeader header = new DeckHeader("New Deck");
     private final CardTable table = new CardTable();
     private  CreatorForm form;

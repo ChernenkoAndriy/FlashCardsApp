@@ -1,7 +1,6 @@
-package com.example.application.views.DeckEditorView;
+package com.example.application.views.DeckEditor;
 
 import com.example.application.data.Card;
-import com.example.application.views.Components.VioletButton;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
