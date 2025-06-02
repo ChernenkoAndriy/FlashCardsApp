@@ -20,6 +20,14 @@ public class UserProgressService {
         return userProgressRepository.findAll();
     }
 
+    public void playedCard(Integer cardId, Integer userId, boolean userKnowsCard) {
+        //TODO
+        // знайти period цієї картки
+        // знайти колоду
+        // switch(userKnowsCard + period) параметри в запит до зміни в user_progress: next_date, period
+        //                                параметри в запит до зміни в user_deck_progress: % вивчення колоди
+    }
+
     public void save(UserProgress userProgress) {
         userProgressRepository.save(userProgress);
     }

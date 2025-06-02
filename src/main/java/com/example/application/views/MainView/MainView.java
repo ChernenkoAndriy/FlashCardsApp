@@ -63,10 +63,8 @@ public class MainView extends VerticalLayout {
     private void configureData() {
         System.out.println();
         for(Language language: languageService.findLanguagesByUserId(userService.findAll().get(0).getId())){
-            System.out.println("Language: " + language.getName());
             decksByLanguage.put(language.getName(), new ArrayList<>());
             for(DeckDto deck: deckService.findActiveDeckDtosByUserAndLanguage(userService.findAll().get(0).getId(),language.getId())){
-                System.out.println(deck.getLanguageName()+" "+ deck.getId()+" "+ deck.getCardsNumber());
                 decksByLanguage.get(language.getName()).add(new DequeCard(deck));
             }
         }

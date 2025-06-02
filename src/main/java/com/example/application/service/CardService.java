@@ -18,7 +18,7 @@ public class CardService {
         return cardRepository.findAll();
     }
 
-    public List<Card> findByDeckId(Long deckId) {
+    public List<Card> findByDeckId(Integer deckId) {
         return cardRepository.findByDeckId(deckId);
     }
 

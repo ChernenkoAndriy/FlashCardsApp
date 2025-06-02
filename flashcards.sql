@@ -28,11 +28,11 @@ CREATE TABLE IF NOT EXISTS `language`
 
 CREATE TABLE IF NOT EXISTS `deck`
 (
-    `id`           int(11)     NOT NULL AUTO_INCREMENT,
-    `name`         varchar(50) NOT NULL,
-    `cards_number` int(11)     NOT NULL DEFAULT 0,
-    `is_active`    bool        NOT NULL DEFAULT 1,
-    `language_id`  int(11)     NOT NULL,
+    `id`           int(11)              NOT NULL AUTO_INCREMENT,
+    `name`         varchar(50)          NOT NULL,
+    `cards_number` int(11)              NOT NULL DEFAULT 0,
+    `is_active`    bool                 NOT NULL DEFAULT 1,
+    `language_id`  int(11)              NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB

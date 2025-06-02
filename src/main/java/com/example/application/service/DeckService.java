@@ -32,7 +32,7 @@ public class DeckService {
         return deckRepository.findActiveDeckDtosByUserAndLanguage(userId, languageId);
     }
 
-    public List<Deck> findActiveByLanguageId(Long languageId) {
+    public List<Deck> findActiveByLanguageId(Integer languageId) {
         return deckRepository.findByLanguageIdAndIsActiveTrue(languageId);
     }
 

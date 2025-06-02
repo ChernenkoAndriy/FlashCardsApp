@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DeckRepository extends JpaRepository<Deck, Long> {
+public interface DeckRepository extends JpaRepository<Deck, Integer> {
 
   List<Deck> findAll();
-  List<Deck> findByLanguageIdAndIsActiveTrue(Long languageId);
+  List<Deck> findByLanguageIdAndIsActiveTrue(Integer languageId);
 
   @Query("""
     SELECT DISTINCT d FROM Deck d
