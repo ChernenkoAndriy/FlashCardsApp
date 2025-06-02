@@ -9,7 +9,7 @@ public class Card {
     @Id
     @GeneratedValue
     @Column(name = "`id`", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "`word`", nullable = false)
     private String word;
@@ -24,9 +24,9 @@ public class Card {
     private String image;
 
     @Column(name = "`deck_id`", nullable = false)
-    private Long deckId;
+    private Integer deckId;
 
-    public Card(String word, String translate, String definition, String image, Long deckId) {
+    public Card(String word, String translate, String definition, String image, Integer deckId) {
         this.word = word;
         this.translate = translate;
         this.definition = definition;
@@ -38,11 +38,11 @@ public class Card {
     }
 
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -78,11 +78,11 @@ public class Card {
         this.image = image;
     }
 
-    public Long getDeckId() {
+    public Integer getDeckId() {
         return deckId;
     }
 
-    public void setDeckId(Long deckId) {
+    public void setDeckId(Integer deckId) {
         this.deckId = deckId;
     }
 }

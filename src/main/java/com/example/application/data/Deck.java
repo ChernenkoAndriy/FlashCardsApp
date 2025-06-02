@@ -9,7 +9,7 @@ public class Deck {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Integer id;
 
     @Column(name = "`name`", nullable = false)
     private String name;
@@ -21,9 +21,9 @@ public class Deck {
     private boolean isActive;
 
     @Column(name ="`language_id`", nullable = false)
-    private Long languageId;
+    private Integer languageId;
 
-    public Deck(String name, int cardsNumber, boolean isActive, Long languageId) {
+    public Deck(String name, int cardsNumber, boolean isActive, Integer languageId) {
         this.name = name;
         this.cardsNumber = cardsNumber;
         this.isActive = isActive;
@@ -56,19 +56,19 @@ public class Deck {
         isActive = active;
     }
 
-    public Long getLanguageId() {
+    public Integer getLanguageId() {
         return languageId;
     }
 
-    public void setLanguageId(Long languageId) {
+    public void setLanguageId(Integer languageId) {
         this.languageId = languageId;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 }

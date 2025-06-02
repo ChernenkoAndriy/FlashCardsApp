@@ -11,7 +11,7 @@ public class Language {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Integer id;
 
     @Column(name = "`name`", nullable = false)
     private String name;
@@ -28,11 +28,11 @@ public class Language {
         this.name = name;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 }

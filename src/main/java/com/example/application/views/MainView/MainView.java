@@ -1,5 +1,12 @@
 package com.example.application.views.MainView;
 
+import com.example.application.data.Deck;
+import com.example.application.data.Language;
+import com.example.application.data.User;
+import com.example.application.dto.DeckDto;
+import com.example.application.service.DeckService;
+import com.example.application.service.LanguageService;
+import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
@@ -34,8 +41,16 @@ public class MainView extends VerticalLayout {
     //можна спробувати написати спосіб отримання подібної мапи з бази і буде метод для відображення цього
     private Map<String, List<DequeCard>> decksByLanguage;
 
-//варто додати через ін'єкцію сервіс, і використовувати його як поле сторінки
-    public MainView() {
+    //доданий через ін'єкцію сервіс, щоб використовувати його як поле сторінки
+    private final DeckService deckService;
+    private final UserService userService;
+    private final LanguageService languageService;
+
+
+    public MainView(DeckService deckService, UserService userService, LanguageService languageService) {
+        this.deckService = deckService;
+        this.userService = userService;
+        this.languageService = languageService;
         initialiseComponents();
         configureStyles();
         configureLayouts();
@@ -46,14 +61,14 @@ public class MainView extends VerticalLayout {
     }
     //ось типу наповнення колекцій
     private void configureData() {
-        decksByLanguage.put("English", new ArrayList<>());
-        decksByLanguage.put("Ukrainian", new ArrayList<>());
-        decksByLanguage.put("German", new ArrayList<>());
-
-        for (int i = 1; i <= 10; i++) {
-            decksByLanguage.get("English").add(new DequeCard("English Deck " + i));
-            decksByLanguage.get("Ukrainian").add(new DequeCard("Ukrainian Deck " + i));
-            decksByLanguage.get("German").add(new DequeCard("German Deck " + i));
+        System.out.println();
+        for(Language language: languageService.findLanguagesByUserId(userService.findAll().get(0).getId())){
+            System.out.println("Language: " + language.getName());
+            decksByLanguage.put(language.getName(), new ArrayList<>());
+            for(DeckDto deck: deckService.findActiveDeckDtosByUserAndLanguage(userService.findAll().get(0).getId(),language.getId())){
+                System.out.println(deck.getLanguageName()+" "+ deck.getId()+" "+ deck.getCardsNumber());
+                decksByLanguage.get(language.getName()).add(new DequeCard(deck));
+            }
         }
     }
     //ось метод для відображення таких речей

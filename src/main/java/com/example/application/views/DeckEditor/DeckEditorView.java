@@ -65,7 +65,7 @@ public class DeckEditorView extends VerticalLayout {
                     "Translation " + i,
                     "Definition of the word number " + i + ". This is a sample long definition to check how it looks when the text is very wide or wraps around.",
                     "https://example.com/image" + i + ".png",
-                    1L
+                    1
             ));
         });
 

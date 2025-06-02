@@ -2,6 +2,7 @@ package com.example.application.service;
 
 
 import com.example.application.data.Language;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import com.example.application.repositories.LanguageRepository;
 import java.util.List;
@@ -18,6 +19,11 @@ public class LanguageService {
     public List<Language> findAll() {
         return languageRepository.findAll();
     }
+
+    public List<Language> findLanguagesByUserId(@Param("userId") Integer userId){
+        return languageRepository.findLanguagesByUserId(userId);
+    }
+
     public void save(Language language) {
         languageRepository.save(language);
     }
