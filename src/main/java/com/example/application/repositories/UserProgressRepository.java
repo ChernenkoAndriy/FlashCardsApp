@@ -12,6 +12,6 @@ import java.util.List;
 public interface UserProgressRepository extends JpaRepository<UserProgress, Integer> {
     List<UserProgress> findAll();
 
-    public void nextStageForCardById(@Param("userId") Integer userId, @Param("cardId") Integer cardId);
+//    public void nextStageForCardById(@Param("userId") Integer userId, @Param("cardId") Integer cardId);
 
 }

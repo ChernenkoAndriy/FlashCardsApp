@@ -1,3 +1,4 @@
+SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
 DELIMITER //
@@ -71,6 +72,21 @@ CREATE TABLE IF NOT EXISTS `user_progress`
   DEFAULT CHARSET = utf8mb4
   AUTO_INCREMENT = 1;
 
+CREATE TABLE IF NOT EXISTS `user_deck`
+(
+    `id`      int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `deck_id` int(11) NOT NULL,
+    `learned_number` int(11) NOT NULL DEFAULT 0,
+    `progress` int (11) NOT NULL DEFAULT 0,
+    `state`   enum ('created', 'active', 'inactive') NOT NULL DEFAULT 'created',
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`deck_id`) REFERENCES `deck` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  AUTO_INCREMENT = 1;
+
 CREATE TRIGGER `update_deck_cards_number`
     AFTER INSERT
     ON `card`
@@ -91,7 +107,46 @@ BEGIN
     WHERE `id` = OLD.`deck_id`;
 END//
 
+CREATE TRIGGER `after_insert_user_progress`
+    AFTER INSERT ON `user_progress`
+    FOR EACH ROW
+BEGIN
+    DECLARE deck INT;
+    DECLARE total_number INT;
 
+    -- Get deck_id for the card
+    SELECT deck_id INTO deck
+    FROM card
+    WHERE id = NEW.card_id;
+
+    -- If user_deck does not exist, insert it
+    IF NOT EXISTS (
+        SELECT 1 FROM user_deck
+        WHERE user_id = NEW.user_id AND deck_id = deck
+    ) THEN
+        INSERT INTO user_deck (user_id, deck_id)
+        VALUES (NEW.user_id, deck);
+END IF;
+
+-- If card is learned, increment learned_number
+IF NEW.is_learned = 1 THEN
+UPDATE user_deck
+SET learned_number = learned_number + 1
+WHERE user_id = NEW.user_id AND deck_id = deck;
+END IF;
+
+    -- Get total number of cards in the deck
+SELECT cards_number INTO total_number
+FROM deck
+WHERE id = deck;
+
+-- Update progress
+UPDATE user_deck
+SET progress = ROUND(learned_number * 100.0 / NULLIF(total_number, 0))
+WHERE user_id = NEW.user_id AND deck_id = deck;
+END;
+
+//
 DELIMITER ;
 
 
