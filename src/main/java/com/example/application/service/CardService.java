@@ -30,7 +30,4 @@ public class CardService {
         cardRepository.delete(card);
     }
 
-    public void update(Card card) {
-        //TODO update method
-    }
 }

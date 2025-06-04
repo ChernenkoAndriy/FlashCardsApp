@@ -2,14 +2,13 @@ package com.example.application.service;
 
 
 import com.example.application.data.Deck;
-import com.example.application.data.Language;
 import com.example.application.dto.DeckDto;
-import com.example.application.repositories.CardRepository;
 import com.example.application.repositories.DeckRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeckService {
@@ -42,5 +41,13 @@ public class DeckService {
 
     public void delete(Deck deck) {
         deckRepository.delete(deck);
+    }
+
+    public void deleteByID(Integer id) {
+        deckRepository.deleteById(id);
+    }
+
+    public Optional<Deck> findById(Integer deckId) {
+        return deckRepository.findById(deckId);
     }
 }

@@ -19,7 +19,7 @@ public class Card {
 
     @Column(name = "`definition`", nullable = false)
     private String definition;
-
+    @Lob
     @Column(name = "`image`", nullable = true)
     private String image;
 
