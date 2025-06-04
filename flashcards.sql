@@ -94,6 +94,11 @@ BEGIN
     UPDATE `deck`
     SET `cards_number` = `cards_number` + 1
     WHERE `id` = NEW.`deck_id`;
+
+    UPDATE user_deck
+    SET progress = ROUND(learned_number * 100.0 / NULLIF(
+            (SELECT cards_number FROM deck WHERE id = NEW.deck_id), 0))
+    WHERE deck_id = NEW.deck_id;
 END//
 
 CREATE TRIGGER `decrement_deck_cards_number`
@@ -104,7 +109,15 @@ BEGIN
     UPDATE `deck`
     SET `cards_number` = `cards_number` - 1
     WHERE `id` = OLD.`deck_id`;
+
+    -- ТУТ МАЄ БУТИ ЩЕ ЗМІНА КІЛЬКОСТІ ВИВЧЕНИХ У ТИХ КОРИСТУВАЧІВ, ЯКІ ЦЮ КАРТКУ ВИВЧИЛИ, АЛЕ ВОНО НЕ ПРАЦЮЄ, ТОМУ Я ВРУЧНУ ЦЕ РОБЛЮ
+
+    UPDATE user_deck
+    SET progress = ROUND(learned_number * 100.0 / NULLIF(
+            (SELECT cards_number FROM deck WHERE id = OLD.deck_id), 0))
+    WHERE deck_id = OLD.deck_id;
 END//
+
 
 CREATE TRIGGER `after_insert_user_progress`
     AFTER INSERT ON `user_progress`
@@ -142,7 +155,7 @@ WHERE id = deck;
 -- Update progress
 UPDATE user_deck
 SET progress = ROUND(learned_number * 100.0 / NULLIF(total_number, 0))
-WHERE user_id = NEW.user_id AND deck_id = deck;
+WHERE deck_id = deck; -- user_id = NEW.user_id AND
 END;
 
 //

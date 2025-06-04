@@ -6,17 +6,20 @@ public class DeckDto {
     private int cardsNumber;
     private String languageName;
     private Integer progress;
+    private Integer learnedNumber;
+
 
 
     /* цей клас потрібен для чистоти коду. конкретно його я створила, бо мені в DequeCard, яка створюється на Deck треба назву мови,
     а підключати туди LanguageService - недоречно
      */
-    public DeckDto(Integer id, String name, int cardsNumber, String languageName, Integer progress) {
+    public DeckDto(Integer id, String name, int cardsNumber, String languageName, Integer progress, Integer learnedNumber) {
         this.id = id;
         this.name = name;
         this.cardsNumber = cardsNumber;
         this.languageName = languageName;
         this.progress = progress;
+        this.learnedNumber = learnedNumber;
     }
 
     public Integer getId() {
@@ -37,6 +40,9 @@ public class DeckDto {
 
     public Integer getProgress() {
         return progress;
+    }
+    public Integer getLearnedNumber() {
+        return learnedNumber;
     }
 
 

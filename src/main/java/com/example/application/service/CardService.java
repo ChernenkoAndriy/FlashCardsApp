@@ -22,11 +22,20 @@ public class CardService {
         return cardRepository.findByDeckId(deckId);
     }
 
+    public List<Card> findAllLearned(){
+        return cardRepository.findAllLearned();
+    }
+
+    public void decrementLearnedNumberForUsersWithLearnedCard(Integer cardId) {
+        cardRepository.decrementLearnedNumberForUsersWithLearnedCard(cardId);
+    }
+
     public void save(Card card) {
         cardRepository.save(card);
     }
 
     public void delete(Card card) {
+        this.decrementLearnedNumberForUsersWithLearnedCard(card.getId());
         cardRepository.delete(card);
     }
 

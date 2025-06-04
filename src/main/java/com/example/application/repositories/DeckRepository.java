@@ -24,7 +24,7 @@ public interface DeckRepository extends JpaRepository<Deck, Integer> {
   List<Deck> findActiveDecksByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId);*/
 
   @Query("""
-    SELECT DISTINCT new com.example.application.dto.DeckDto(d.id, d.name, d.cardsNumber, l.name, ud.progress)
+    SELECT DISTINCT new com.example.application.dto.DeckDto(d.id, d.name, d.cardsNumber, l.name, ud.progress, ud.learnedNumber)
     FROM Deck d
     JOIN Card c ON c.deckId = d.id
     JOIN UserProgress p ON p.cardId = c.id

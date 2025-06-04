@@ -1,7 +1,9 @@
 package com.example.application.views.MainView;
 
+import com.example.application.data.Card;
 import com.example.application.data.Language;
 import com.example.application.dto.DeckDto;
+import com.example.application.service.CardService;
 import com.example.application.service.DeckService;
 import com.example.application.service.LanguageService;
 import com.example.application.service.UserService;
@@ -34,11 +36,14 @@ public class MainView extends VerticalLayout {
     private final DeckService deckService;
     private final UserService userService;
     private final LanguageService languageService;
+    private final CardService cardService;
 
-    public MainView(DeckService deckService, UserService userService, LanguageService languageService) {
+
+    public MainView(DeckService deckService, UserService userService, LanguageService languageService, CardService cardService) {
         this.deckService = deckService;
         this.userService = userService;
         this.languageService = languageService;
+        this.cardService = cardService;
 
         initialiseComponents();
         configureStyles();
@@ -101,6 +106,9 @@ public class MainView extends VerticalLayout {
     }
     private void updateDecksData() {
         decksByLanguage.clear();
+        for(Card card : cardService.findAllLearned()){
+            System.out.println(card.getWord()+" "+card.getDeckId());
+        }
 
         Integer userId = userService.findAll().get(0).getId();
         for (Language language : languageService.findLanguagesByUserId(userId)) {

@@ -39,6 +39,8 @@ public class DequeCard extends Card {
 
     public DequeCard(DeckDto deckFromDB) {
         this(deckFromDB.getName(), deckFromDB.getCardsNumber(), deckFromDB.getLanguageName(), deckFromDB.getProgress());
+        System.out.println(deckFromDB.getName() + " " + deckFromDB.getCardsNumber() + " " + deckFromDB.getProgress() + " " + deckFromDB.getLearnedNumber());
+
     }
 
     private VerticalLayout createLeftLayout() {
@@ -103,6 +105,7 @@ public class DequeCard extends Card {
     }
 
     public void setProgress(double value) {
+        System.out.println(value);
         progressBar.setValue(value*0.01);
     }
 }
