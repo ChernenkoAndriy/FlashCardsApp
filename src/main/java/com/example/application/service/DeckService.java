@@ -24,17 +24,14 @@ public class DeckService {
         return deckRepository.findAll();
     }
 
-    public List<Deck> findActiveDecksByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId) {
+    /*public List<Deck> findActiveDecksByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId) {
         return deckRepository.findActiveDecksByUserAndLanguage(userId, languageId);
-    }
+    }*/
 
     public List<DeckDto> findActiveDeckDtosByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId) {
         return deckRepository.findActiveDeckDtosByUserAndLanguage(userId, languageId);
     }
 
-    public List<Deck> findActiveByLanguageId(Integer languageId) {
-        return deckRepository.findByLanguageIdAndIsActiveTrue(languageId);
-    }
 
     public void save(Deck deck) {
         deckRepository.save(deck);

@@ -32,7 +32,6 @@ CREATE TABLE IF NOT EXISTS `deck`
     `id`           int(11)              NOT NULL AUTO_INCREMENT,
     `name`         varchar(50)          NOT NULL,
     `cards_number` int(11)              NOT NULL DEFAULT 0,
-    `is_active`    bool                 NOT NULL DEFAULT 1,
     `language_id`  int(11)              NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`language_id`) REFERENCES `language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -79,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `user_deck`
     `deck_id` int(11) NOT NULL,
     `learned_number` int(11) NOT NULL DEFAULT 0,
     `progress` int (11) NOT NULL DEFAULT 0,
-    `state`   enum ('created', 'active', 'inactive') NOT NULL DEFAULT 'created',
+    `is_active`    bool                 NOT NULL DEFAULT 1,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`deck_id`) REFERENCES `deck` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -158,19 +157,30 @@ INSERT INTO `language` (`name`)
 VALUES ('English'), ('Ukrainian'), ('German');
 
 -- English decks (language_id = 1)
-INSERT INTO `deck` (`name`, `language_id`, `is_active`) VALUES
-                                                            ('Simple words', 1, 1),
-                                                            ('Normal words', 1, 1),
-                                                            ('WORDS', 1, 1),
+INSERT INTO `deck` (`name`, `language_id`) VALUES
+                                                            ('Simple words', 1),
+                                                            ('Normal words', 1),
+                                                            ('WORDS', 1),
 
 -- Ukrainian decks (language_id = 2)
-                                                            ('Я вчу українську', 2, 1),
+                                                            ('Я вчу українську', 2),
 
 -- German decks (language_id = 3)
-                                                            ('Deutsch', 3, 1),
-                                                            ('Deutsch 2', 3, 1);
+                                                            ('Deutsch', 3),
+                                                            ('Deutsch 2', 3);
 
+-- English decks (language_id = 1)
+INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
+                                               (1, 1),
+                                               (1, 1),
+                                               (1, 1),
 
+-- Ukrainian decks (language_id = 2)
+                                               (1, 2),
+
+-- German decks (language_id = 3)
+                                               (1, 3),
+                                               (1, 3);
 
 -- Cards for English Deck 1 (deck_id = 1)
 INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
@@ -218,9 +228,9 @@ INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUE
 
 
 INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
-VALUES (1, 1, 'created', 0, NULL, 0),
-       (1, 2, 'created', 0, NULL, 0),
-       (1, 3, 'created', 0, NULL, 0),
+VALUES (1, 1, 'created', 0, NULL, 1),
+       (1, 2, 'created', 0, NULL, 1),
+       (1, 3, 'created', 0, NULL, 1),
        (1, 4, 'created', 0, NULL, 0),
        (1, 5, 'created', 0, NULL, 0),
        (1, 6, 'created', 0, NULL, 0),
@@ -245,5 +255,5 @@ VALUES (1, 1, 'created', 0, NULL, 0),
        (1, 25, 'created', 0, NULL, 0),
        (1, 26, 'created', 0, NULL, 0),
        (1, 27, 'created', 0, NULL, 0),
-       (1, 28, 'created', 0, NULL, 0),
-       (1, 29, 'created', 0, NULL, 0);
+       (1, 28, 'created', 0, NULL, 1),
+       (1, 29, 'created', 0, NULL, 1);

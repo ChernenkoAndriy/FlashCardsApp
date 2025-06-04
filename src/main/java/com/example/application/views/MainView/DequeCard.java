@@ -18,10 +18,11 @@ public class DequeCard extends Card {
     private final H5 size = new H5();
     private final H5 mainLanguage = new H5();
 
-    public DequeCard(String title, Integer numberOfCards, String language) {
+    public DequeCard(String title, Integer numberOfCards, String language, Integer progress) {
         name.setText(title);
         size.setText("Size: " + numberOfCards);
         mainLanguage.setText("Language: " + language);
+        this.setProgress(progress);
 
         VerticalLayout left = createLeftLayout();
         VerticalLayout center = createCenterLayout();
@@ -37,7 +38,7 @@ public class DequeCard extends Card {
     }
 
     public DequeCard(DeckDto deckFromDB) {
-        this(deckFromDB.getName(), deckFromDB.getCardsNumber(), deckFromDB.getLanguageName());
+        this(deckFromDB.getName(), deckFromDB.getCardsNumber(), deckFromDB.getLanguageName(), deckFromDB.getProgress());
     }
 
     private VerticalLayout createLeftLayout() {
@@ -53,7 +54,6 @@ public class DequeCard extends Card {
         center.setPadding(false);
         center.setSpacing(false);
         progressBar.setWidth("100%");
-        progressBar.setValue(0.55);
         progressBar.getStyle()
                 .set("background-color", "white")
                 .set("border", "2px solid #ffffff")
@@ -103,6 +103,6 @@ public class DequeCard extends Card {
     }
 
     public void setProgress(double value) {
-        progressBar.setValue(value);
+        progressBar.setValue(value*0.01);
     }
 }

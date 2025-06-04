@@ -17,16 +17,13 @@ public class Deck {
     @Column(name ="`cards_number`", nullable = false)
     private int cardsNumber;
 
-    @Column(name = "`is_active`", nullable = false)
-    private boolean isActive;
 
     @Column(name ="`language_id`", nullable = false)
     private Integer languageId;
 
-    public Deck(String name, int cardsNumber, boolean isActive, Integer languageId) {
+    public Deck(String name, int cardsNumber, Integer languageId) {
         this.name = name;
         this.cardsNumber = cardsNumber;
-        this.isActive = isActive;
         this.languageId = languageId;
     }
     public Deck() {
@@ -48,13 +45,6 @@ public class Deck {
         this.cardsNumber = cardsNumber;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 
     public Integer getLanguageId() {
         return languageId;
