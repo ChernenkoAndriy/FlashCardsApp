@@ -13,28 +13,25 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.theme.lumo.Lumo;
 import jakarta.annotation.PostConstruct;
 
-//Цей клас кодує по суті оранжевий заголовок над іншими сторінками, тобто інші сторінки будуть вставлені в неї
 public class MainLayout extends AppLayout implements RouterLayout {
-    //цей сервіс потрібен щоб розлогінити користувача
     private final SecurityService securityService;
-    //елементи заголовку
     private H3 titleLabel;
     private Image logoImage;
     private Button logoutButton;
     private Button themeToggleButton;
+    private Button backButton;
 
-    //інжектиться сервіс
     public MainLayout(SecurityService securityService) {
         this.securityService = securityService;
         logoImage = new Image("icons/Logo.png", "Sleeve logo");
         titleLabel = new H3("Sleeve");
         logoutButton = new VioletButton("Log out");
         themeToggleButton = new VioletButton("Toggle Theme");
+        backButton = new VioletButton("Back");
 
         configureContent();
         configureLayout();
 
-        // Застосування теми на основі збереженого значення у localStorage
         UI.getCurrent().getPage().executeJs("""
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme === 'dark') {
@@ -44,18 +41,28 @@ public class MainLayout extends AppLayout implements RouterLayout {
         """, UI.getCurrent().getElement());
     }
 
-    //тут назначаються методи на кнопки
     private void configureContent() {
         logoutButton.addClickListener(e -> securityService.logout());
+
         themeToggleButton.addClickListener(e -> toggleTheme());
+
+        backButton.addClickListener(e -> UI.getCurrent().getPage().getHistory().back());
+
+        // Натискання на логотип — перехід на домашню сторінку
+        logoImage.getElement().getStyle().set("cursor", "pointer");  // змінюємо курсор на pointer
+        logoImage.addClickListener(e -> UI.getCurrent().navigate(""));  // або UI.getCurrent().navigate(HomeView.class);
     }
 
-    //тут просто визначаються кольори, положення і стиль
     private void configureLayout() {
         HorizontalLayout leftSection = new HorizontalLayout(logoImage, titleLabel);
         leftSection.setAlignItems(FlexComponent.Alignment.CENTER);
+        leftSection.setSpacing(true);
 
-        HorizontalLayout header = new HorizontalLayout(leftSection, themeToggleButton, logoutButton);
+        HorizontalLayout rightSection = new HorizontalLayout(backButton, themeToggleButton, logoutButton);
+        rightSection.setAlignItems(FlexComponent.Alignment.CENTER);
+        rightSection.setSpacing(true);
+
+        HorizontalLayout header = new HorizontalLayout(leftSection, rightSection);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setWidthFull();
         header.expand(leftSection);
@@ -69,27 +76,27 @@ public class MainLayout extends AppLayout implements RouterLayout {
         logoImage.setHeight("30px");
         logoImage.getStyle().set("margin-right", "10px");
 
-        addToNavbar(header);   // метод додає до navbar з appLayout наш кастомний оранжевий елемент нагору
+        addToNavbar(header);
     }
 
-    //метод міняє тему додатку на темну або світлу, і зберігає вибір у localStorage
+
     private void toggleTheme() {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-            boolean darkMode;
+        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+        boolean darkMode;
 
-            if (themeList.contains(Lumo.DARK)) {
-                themeList.remove(Lumo.DARK);
-                darkMode = false;
-            } else {
-                themeList.add(Lumo.DARK);
-                darkMode = true;
-            }
-
-            // Збереження теми в cookie
-            UI.getCurrent().getPage().executeJs(
-                    "document.cookie = 'darkTheme=' + $0 + '; path=/; max-age=31536000'", darkMode
-            );
+        if (themeList.contains(Lumo.DARK)) {
+            themeList.remove(Lumo.DARK);
+            darkMode = false;
+        } else {
+            themeList.add(Lumo.DARK);
+            darkMode = true;
         }
+
+        UI.getCurrent().getPage().executeJs(
+                "document.cookie = 'darkTheme=' + $0 + '; path=/; max-age=31536000'", darkMode
+        );
+    }
+
     @PostConstruct
     private void applySavedTheme() {
         UI.getCurrent().getPage().executeJs(
@@ -102,5 +109,3 @@ public class MainLayout extends AppLayout implements RouterLayout {
         });
     }
 }
-
-

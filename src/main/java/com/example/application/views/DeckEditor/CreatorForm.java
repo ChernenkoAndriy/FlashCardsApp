@@ -12,15 +12,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.StringLengthValidator;
-
 import java.util.function.Consumer;
-
 public class CreatorForm extends VerticalLayout {
-
-    // === Поля (Fields) ===
     private final TextField word = new TextField("Word");
     private final TextField translate = new TextField("Translation");
-    private final TextField image = new TextField("Image URL");
+    private final TextArea image = new TextArea("Image URL");
     private final TextArea definition = new TextArea("Definition");
     private final Button save = new Button("Save");
     private final Button delete = new Button("Delete");
@@ -51,7 +47,7 @@ public class CreatorForm extends VerticalLayout {
                 .bind(Card::getDefinition, Card::setDefinition);
         binder.forField(image)
                 .withNullRepresentation("")
-                .withValidator(new StringLengthValidator("Image URL must be between 1 and 200 characters", 1, 200))
+                .withValidator(new StringLengthValidator("Image URL must be between 1 and 2048 characters", 1, 2048))
                 .bind(Card::getImage, Card::setImage);
     }
     public void setCard(Card card) {
@@ -61,8 +57,16 @@ public class CreatorForm extends VerticalLayout {
     private void configureListeners(Consumer<Card> onSave, Consumer<Card> onDelete) {
         save.addClickListener(event -> {
             if (binder.isValid()) {
-                binder.writeBeanIfValid(card);
-                onSave.accept(card);
+                if (card == null) {
+                    card = new Card();
+                }
+                try {
+                    binder.writeBean(card);
+                    onSave.accept(card);
+                    setCard(new Card());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         delete.addClickListener(event -> {
@@ -71,7 +75,6 @@ public class CreatorForm extends VerticalLayout {
             }
         });
     }
-    //Стилізація
     private void configureLayout() {
         setSizeFull();
         setAlignItems(Alignment.CENTER);
@@ -80,11 +83,12 @@ public class CreatorForm extends VerticalLayout {
         setPadding(true);
     }
     private void configureFields() {
-        for (TextField field : new TextField[]{word, translate, image}) {
+        for (TextField field : new TextField[]{word, translate}) {
             field.setWidthFull();
             field.setMaxWidth("400px");
         }
-
+        image.setWidthFull();
+        image.setMaxWidth("400px");
         definition.setWidthFull();
         definition.setMaxWidth("400px");
         definition.setHeight("150px");

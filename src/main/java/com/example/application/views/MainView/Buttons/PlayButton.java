@@ -1,15 +1,19 @@
 package com.example.application.views.MainView.Buttons;
 
+import com.example.application.dto.DeckDto;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+
+import java.util.function.Consumer;
+
 //отут як і в редагуванні треба якось передати id як конфігурацію на наступну сторінку
 //але я хз як це зробити тож поки не чіпай, рівно як і кнопку edit
 public class PlayButton extends MiniButton {
-    public PlayButton() {
+    public PlayButton(DeckDto deckDto, Consumer<DeckDto> onPlay) {
         super();
         Icon playIcon = new Icon(VaadinIcon.PLAY);
         this.setIcon(playIcon);
@@ -26,9 +30,9 @@ public class PlayButton extends MiniButton {
             buttonsLayout.setWidth("100%");
             buttonsLayout.setHeight("100%");
 
-            Button revision = new Button("Revision", e -> dialog.close());
-            Button definition = new Button("Definition", e -> dialog.close());
-            Button advanced = new Button("Advanced", e -> dialog.close());
+            Button revision = new Button("Revision", e -> onPlay.accept(deckDto));
+            Button definition = new Button("Definition", e -> onPlay.accept(deckDto));
+            Button advanced = new Button("Advanced", e -> onPlay.accept(deckDto));
 
             revision.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             definition.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

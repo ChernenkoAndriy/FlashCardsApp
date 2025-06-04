@@ -1,11 +1,13 @@
 package com.example.application.views.MainView;
 
+import com.example.application.dto.DeckDto;
 import com.example.application.views.MainView.Buttons.DeleteButton;
 import com.example.application.views.MainView.Buttons.EditButton;
 import com.example.application.views.MainView.Buttons.PlayButton;
-import com.example.application.views.MainView.DequeCard;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+
+import java.util.function.Consumer;
 
 public class DequeRow extends HorizontalLayout {
 
@@ -13,21 +15,32 @@ public class DequeRow extends HorizontalLayout {
     private Button deleteButton;
     private Button editButton;
     private Button playButton;
-//тут можна зробити щоб в конструктор передалась сама дека,
-// а картка автоматично створювалась від деки, щоб не створювати з ззовні
-    //також потрібно передати лямбдою методи, які будуть виконувати кнопки
 
-    public DequeRow(DequeCard dequeCard) {
-        this.dequeCard = dequeCard;
-        initializeComponents();
+    /**
+     * @param deckDto     The deck to display.
+     * @param onDelete    Action to perform when delete is clicked.
+     * @param onEdit      Action to perform when edit is clicked.
+     * @param onPlay      Action to perform when play is clicked.
+     */
+    public DequeRow(DeckDto deckDto,
+                    Consumer<DeckDto> onDelete,
+                    Consumer<DeckDto> onEdit,
+                    Consumer<DeckDto> onPlay) {
+        this.dequeCard = new DequeCard(deckDto);
+        initializeComponents(deckDto, onDelete, onEdit, onPlay);
         configureLayout();
         applyStyles();
     }
 
-    private void initializeComponents() {
-        deleteButton = new DeleteButton();
-        editButton   = new EditButton();
-        playButton   = new PlayButton();
+    private void initializeComponents(DeckDto deckDto,
+                                      Consumer<DeckDto> onDelete,
+                                      Consumer<DeckDto> onEdit,
+                                      Consumer<DeckDto> onPlay) {
+
+        deleteButton = new DeleteButton(deckDto, onDelete);
+        editButton   = new EditButton(deckDto, onEdit);
+        playButton   = new PlayButton(deckDto, onPlay);
+
         dequeCard.setWidth("60%");
     }
 

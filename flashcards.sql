@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `card`
     `word`       varchar(50)  NOT NULL,
     `translate`  varchar(50)  NOT NULL,
     `definition` varchar(100) NOT NULL,
-    `image`      varchar(255) NULL,
+    `image`      varchar(2048) NULL,
     `deck_id`    int(11)      NOT NULL,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`deck_id`) REFERENCES `deck` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
