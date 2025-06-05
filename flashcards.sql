@@ -111,13 +111,14 @@ BEGIN
     SET `cards_number` = `cards_number` - 1
     WHERE `id` = OLD.`deck_id`;
 
-    -- ТУТ МАЄ БУТИ ЩЕ ЗМІНА КІЛЬКОСТІ ВИВЧЕНИХ У ТИХ КОРИСТУВАЧІВ, ЯКІ ЦЮ КАРТКУ ВИВЧИЛИ, АЛЕ ВОНО НЕ ПРАЦЮЄ, ТОМУ Я ВРУЧНУ ЦЕ РОБЛЮ
+--     ТУТ МАЄ БУТИ ЩЕ ЗМІНА КІЛЬКОСТІ ВИВЧЕНИХ У ТИХ КОРИСТУВАЧІВ, ЯКІ ЦЮ КАРТКУ ВИВЧИЛИ, АЛЕ ВОНО НЕ ПРАЦЮЄ, ТОМУ Я ВРУЧНУ ЦЕ РОБЛЮ
 
     UPDATE user_deck
     SET progress = ROUND(learned_number * 100.0 / NULLIF(
             (SELECT cards_number FROM deck WHERE id = OLD.deck_id), 0))
     WHERE deck_id = OLD.deck_id;
-END//
+END;
+//
 
 
 CREATE TRIGGER `after_insert_user_progress`
@@ -127,12 +128,8 @@ BEGIN
     DECLARE deck INT;
     DECLARE total_number INT;
 
-    -- Get deck_id for the card
-    SELECT deck_id INTO deck
-    FROM card
-    WHERE id = NEW.card_id;
+    SELECT deck_id INTO deck FROM card WHERE id = NEW.card_id;
 
-    -- If user_deck does not exist, insert it
     IF NOT EXISTS (
         SELECT 1 FROM user_deck
         WHERE user_id = NEW.user_id AND deck_id = deck
@@ -141,25 +138,22 @@ BEGIN
         VALUES (NEW.user_id, deck);
 END IF;
 
--- If card is learned, increment learned_number
 IF NEW.is_learned = 1 THEN
 UPDATE user_deck
 SET learned_number = learned_number + 1
 WHERE user_id = NEW.user_id AND deck_id = deck;
 END IF;
 
-    -- Get total number of cards in the deck
 SELECT cards_number INTO total_number
 FROM deck
 WHERE id = deck;
 
--- Update progress
 UPDATE user_deck
 SET progress = ROUND(learned_number * 100.0 / NULLIF(total_number, 0))
-WHERE deck_id = deck; -- user_id = NEW.user_id AND
+WHERE user_id = NEW.user_id AND deck_id = deck;
 END;
-
 //
+
 DELIMITER ;
 
 
@@ -187,12 +181,12 @@ INSERT INTO `deck` (`name`, `language_id`) VALUES
 
 -- German decks (language_id = 3)
                                                             ('Deutsch', 3),
-                                                            ('Deutsch 2', 3);
+                                                            ('Deutsch 2', 3),
 
 -- diana`s decks
                                                            ('Діана вчить англійську', 1),
                                                            ('Діана це вивчила', 1),
-                                                           ('Діана вчить німецька', 3);
+                                                           ('Діана вчить німецька', 3),
 -- iryna`s decks
                                                            ('Irina lernt Englisch', 1),
                                                            ('Irina lernt Ukrainisch', 2);
@@ -210,15 +204,13 @@ INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
 
 -- German decks (language_id = 3)
                                                (1, 5),
-                                               (1, 6);
+                                               (1, 6),
 
 -- Diana`s decks
-INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
                                                (2, 7),
                                                (2, 8),
-                                               (2, 9);
+                                               (2, 9),
 -- Iryna`s decks
-INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
                                                (3, 10),
                                                (3, 11);
 
@@ -243,64 +235,56 @@ INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUE
                                                                                ('lamp', 'лампа', 'a device for giving light', NULL, 3),
                                                                                ('moon', 'місяць', 'a satellite of the Earth', NULL, 3),
                                                                                ('nest', 'гніздо', 'a birds home', NULL, 3),
-                                                                               ('orange', 'апельсин', 'a citrus fruit', NULL, 3);
+                                                                               ('orange', 'апельсин', 'a citrus fruit', NULL, 3),
 
 -- Cards for Ukrainian Deck 1 (deck_id = 4)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('вікно', 'window', 'an opening in a wall', NULL, 4),
                                                                                ('город', 'garden', 'a place to grow plants', NULL, 4),
                                                                                ('дерево', 'tree', 'a tall plant', NULL, 4),
                                                                                ('екран', 'screen', 'a surface to display info', NULL, 4),
-                                                                               ('жук', 'beetle', 'a type of insect', NULL, 4);
+                                                                               ('жук', 'beetle', 'a type of insect', NULL, 4),
 
 -- Cards for German Deck 1 (deck_id = 5)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('Haus', 'будинок', 'a building where people live', NULL, 5),
                                                                                ('Stuhl', 'стілець', 'a seat with legs', NULL, 5),
-                                                                               ('Tisch', 'стіл', 'a flat surface on legs', NULL, 5);
+                                                                               ('Tisch', 'стіл', 'a flat surface on legs', NULL, 5),
 
 -- Cards for German Deck 2 (deck_id = 6)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('Fenster', 'вікно', 'an opening in a wall', NULL, 6),
                                                                                ('Tür', 'двері', 'a movable barrier', NULL, 6),
                                                                                ('Brot', 'хліб', 'baked food made from flour', NULL, 6),
                                                                                ('Milch', 'молоко', 'a drink from cows', NULL, 6),
-                                                                               ('Wasser', 'вода', 'a liquid essential for life', NULL, 6);
+                                                                               ('Wasser', 'вода', 'a liquid essential for life', NULL, 6),
 
 
 -- Cards for Diana`s Deck 1 (deck_id = 7)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('hello', 'привіт', 'a greeting', NULL, 7),
                                                                                ('goodbye', 'до побачення', 'a farewell', NULL, 7),
                                                                                ('please', 'будь ласка', 'a polite request', NULL, 7),
                                                                                ('thank you', 'дякую', 'an expression of gratitude', NULL, 7),
-                                                                               ('sorry', 'вибачте', 'an apology', NULL, 7);
+                                                                               ('sorry', 'вибачте', 'an apology', NULL, 7),
 -- Cards for Diana`s Deck 2 (deck_id = 8)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('yes', 'так', 'an affirmative response', NULL, 8),
                                                                                ('no', 'ні', 'a negative response', NULL, 8),
                                                                                ('maybe', 'можливо', 'an uncertain response', NULL, 8),
                                                                                ('help', 'допомога', 'assistance', NULL, 8),
-                                                                               ('stop', 'стоп', 'to cease movement or action', NULL, 8);
+                                                                               ('stop', 'стоп', 'to cease movement or action', NULL, 8),
 -- Cards for Diana`s Deck 3 (deck_id = 9)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                          ('Katze', 'кіт', 'a domestic animal that purrs', NULL, 9),
                                                          ('Hund', 'пес', 'a loyal domestic animal', NULL, 9),
                                                          ('Vogel', 'птах', 'an animal that can fly', NULL, 9),
                                                          ('Fisch', 'риба', 'an animal that lives in water', NULL, 9),
-                                                         ('Maus', 'миша', 'a small rodent', NULL, 9);
+                                                         ('Maus', 'миша', 'a small rodent', NULL, 9),
 
 
 -- Cards for Iryna`s Deck 3 (deck_id = 10)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                                                ('water', 'вода', 'a liquid essential for life', NULL, 10),
                                                                                ('food', 'їжа', 'substance for nourishment', NULL, 10),
                                                                                ('sleep', 'сон', 'a state of rest', NULL, 10),
                                                                                ('play', 'грати', 'to engage in activity for enjoyment', NULL, 10),
-                                                                               ('work', 'робота', 'activity involving mental or physical effort', NULL, 10);
+                                                                               ('work', 'робота', 'activity involving mental or physical effort', NULL, 10),
 
 -- Cards for Iryna`s Deck 2 (deck_id = 11)
-INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
                                                          ('заєць', 'hare', 'a fast-running animal with long ears', NULL, 11),
                                                          ('кіт', 'whale', 'a large marine mammal', NULL, 11),
                                                          ('лев', 'lion', 'a large wild cat known as the king of the jungle', NULL, 11),
@@ -337,12 +321,11 @@ VALUES (1, 1, 'created', 0, NULL, 1),
        (1, 26, 'created', 0, NULL, 0),
        (1, 27, 'created', 0, NULL, 0),
        (1, 28, 'created', 0, NULL, 1),
-       (1, 29, 'created', 0, NULL, 1);
+       (1, 29, 'created', 0, NULL, 1),
 
 
 -- Diana`s progress
-INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
-VALUES (2, 30, 'created', 0, NULL, 0),
+               (2, 30, 'created', 0, NULL, 0),
                (2, 31, 'learning', 1, '2025-06-06 10:00:00', 0),
                (2, 32, 'first', 1, '2025-06-06 10:00:00', 0),
                (2, 33, 'second', 1, '2025-06-06 10:00:00', 0),
@@ -356,12 +339,11 @@ VALUES (2, 30, 'created', 0, NULL, 0),
                (2, 41,  'second', 0, '2025-06-07 10:00:00', 0),
                (2, 42,  'second', 0, '2025-06-07 10:00:00', 0),
                (2, 43,  'second', 0, '2025-06-07 10:00:00', 0),
-               (2, 44,  'second', 1, '2025-06-07 10:00:00', 0);
+               (2, 44,  'second', 1, '2025-06-07 10:00:00', 0),
 
 
 -- Iryna`s progress
-INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
-VALUES (3, 45, 'created', 0, NULL, 0),
+               (3, 45, 'created', 0, NULL, 0),
                (3, 46, 'learning', 1, '2025-06-06 10:00:00', 0),
                (3, 47, 'first', 1, '2025-06-06 10:00:00', 0),
                (3, 48, 'second', 1, '2025-06-06 10:00:00', 0),
