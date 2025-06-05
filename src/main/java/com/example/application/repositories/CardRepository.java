@@ -86,9 +86,9 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
             JOIN Deck d ON d.id = c.deckId
             JOIN UserProgress p ON p.cardId = c.id
             JOIN UserDeck ud ON c.deckId = ud.deckId
-            WHERE ud.userId = :userId AND p.userId = :userId AND ud.isActive = true AND d.languageId=:languageId AND p.isLearned = false AND p.period='learning'
+            WHERE ud.userId = :userId AND p.userId = :userId AND ud.isActive = true AND d.languageId=:languageId AND p.isLearned = false AND p.period='learning' AND p.nextDate IS NOT NULL AND p.nextDate<=:today
             """)
-    List<Card> findAllActiveLearningByUserByLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId);
+    List<Card> findAllActiveLearningByUserByLanguageForToday(@Param("userId") Integer userId, @Param("languageId") Integer languageId, @Param("today") LocalDateTime date);
 
 
     @Query("""
