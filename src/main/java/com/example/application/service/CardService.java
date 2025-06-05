@@ -2,16 +2,24 @@ package com.example.application.service;
 
 import com.example.application.data.Card;
 import com.example.application.repositories.CardRepository;
+import com.example.application.repositories.UserRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class CardService {
 
     private final CardRepository cardRepository;
+    private final UserRepository userRepository;
 
-    public CardService(CardRepository cardRepository) {
+    public CardService(CardRepository cardRepository, UserRepository userRepository) {
         this.cardRepository = cardRepository;
+        this.userRepository = userRepository;
     }
 
     public List<Card> findAll() {
@@ -22,12 +30,50 @@ public class CardService {
         return cardRepository.findByDeckId(deckId);
     }
 
-    public List<Card> findAllLearned(){
-        return cardRepository.findAllLearned();
+    public List<Card> findAllLearnedByUser(Integer userId) {
+        return cardRepository.findAllLearnedByUser(userId);
+    }
+
+    public boolean userHasCardsByLanguage(Integer userId, Integer languageId) {
+        return !cardRepository.findAllByUserByLanguage(userId, languageId).isEmpty();
+    }
+
+    public boolean userHasUnlearnedCardsByLanguage(Integer userId, Integer languageId) {
+        return !cardRepository.findAllUnlearnedByUserByLanguage(userId, languageId).isEmpty();
     }
 
     public void decrementLearnedNumberForUsersWithLearnedCard(Integer cardId) {
         cardRepository.decrementLearnedNumberForUsersWithLearnedCard(cardId);
+    }
+
+    // Може бути ситуація, коли повертається порожній список. Це треба перевіряти вище і казати користувачу, що в нього нема карток на сьогодні
+    public List<Card> getJam(Integer userId, Integer languageId) {
+        List<Card> cardsForToday = cardRepository.findAllActiveNotLearnedByUserByLanguageWithDates(userId, languageId, LocalDateTime.now());
+        List<Card> cardsInLearn = new ArrayList<>();
+        List<Card> freshCards = new ArrayList<>();
+        //int n = userRepository.findById(userId).ifPresent(user -> {user.getWordsNumber});
+        int n = 10;
+        if (cardsForToday.size() >= n) {
+            cardsForToday = cardsForToday.subList(0, n);
+        } else {
+            cardsInLearn = cardRepository.findAllActiveLearningByUserByLanguage(userId, languageId);
+            Collections.shuffle(cardsInLearn);
+            if (cardsInLearn.size() >= n - cardsForToday.size()) {
+                cardsInLearn = cardsInLearn.subList(0, n - cardsForToday.size());
+            } else{
+                freshCards = cardRepository.findAllActiveCreatedByUserByLanguage(userId, languageId);
+                Collections.shuffle(freshCards);
+                if (freshCards.size() >= n - (cardsForToday.size()+cardsInLearn.size())) {
+                    freshCards = freshCards.subList(0, n -(cardsForToday.size()+cardsInLearn.size()));
+                }
+            }
+        }
+        List<Card> jam = new ArrayList<>();
+        jam.addAll(cardsForToday);
+        jam.addAll(cardsInLearn);
+        jam.addAll(freshCards);
+        Collections.shuffle(jam);
+        return jam;
     }
 
     public void save(Card card) {
