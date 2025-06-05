@@ -22,15 +22,19 @@ public class User {
     @Column(nullable = false)
     private String language;
 
+    @Column(nullable = false)
+    private int workload;
+
 
     public User() {
     }
 
-    public User(String username, String email, String password, String language) {
+    public User(String username, String email, String password, String language, Integer workload) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.language = language;
+        this.workload = workload;
     }
 
 
@@ -63,6 +67,13 @@ public class User {
     }
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public int getWorkload() {
+        return workload;
+    }
+    public void setWorkload(int workload) {
+        this.workload = workload;
     }
 
 }

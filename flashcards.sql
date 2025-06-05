@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `user`
     `email`    varchar(100) NOT NULL,
     `password` varchar(255) NOT NULL,
     `language` varchar(30)  NOT NULL,
+    `workload` int(11)   NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `username` (`username`)
 ) ENGINE = InnoDB
@@ -163,14 +164,20 @@ DELIMITER ;
 
 
 -- ТЕСТОВІ ДАНІ --
-INSERT INTO `user` (`username`, `email`, `password`, `language`)
-VALUES ('admin', 'admin@gmail.com', 'admin777', 'Ukrainian');
+INSERT INTO `user` (`username`, `email`, `password`, `language`, `workload`)
+VALUES ('admin', 'admin@gmail.com', 'admin777', 'Ukrainian', 20),
+       ('diana', 'diana@gmail.com', 'diana777', 'Ukrainian', 10),
+       ('iryna', 'iryna@gmail.com', 'iryna777', 'German', 15),
+       ('andriy', 'andriy@gmail.com', 'andriy777', 'English', 30);
+
 
 INSERT INTO `language` (`name`)
 VALUES ('English'), ('Ukrainian'), ('German');
 
 -- English decks (language_id = 1)
 INSERT INTO `deck` (`name`, `language_id`) VALUES
+
+-- user`s decks
                                                             ('Simple words', 1),
                                                             ('Normal words', 1),
                                                             ('WORDS', 1),
@@ -182,18 +189,39 @@ INSERT INTO `deck` (`name`, `language_id`) VALUES
                                                             ('Deutsch', 3),
                                                             ('Deutsch 2', 3);
 
--- English decks (language_id = 1)
+-- diana`s decks
+                                                           ('Діана вчить англійську', 1),
+                                                           ('Діана це вивчила', 1),
+                                                           ('Діана вчить німецька', 3);
+-- iryna`s decks
+                                                           ('Irina lernt Englisch', 1),
+                                                           ('Irina lernt Ukrainisch', 2);
+
+
+
+-- User`s decks
 INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
                                                (1, 1),
-                                               (1, 1),
-                                               (1, 1),
+                                               (1, 2),
+                                               (1, 3),
 
 -- Ukrainian decks (language_id = 2)
-                                               (1, 2),
+                                               (1, 4),
 
 -- German decks (language_id = 3)
-                                               (1, 3),
-                                               (1, 3);
+                                               (1, 5),
+                                               (1, 6);
+
+-- Diana`s decks
+INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
+                                               (2, 7),
+                                               (2, 8),
+                                               (2, 9);
+-- Iryna`s decks
+INSERT INTO `user_deck` (`user_id`, `deck_id`) VALUES
+                                               (3, 10),
+                                               (3, 11);
+
 
 -- Cards for English Deck 1 (deck_id = 1)
 INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
@@ -240,6 +268,46 @@ INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUE
                                                                                ('Wasser', 'вода', 'a liquid essential for life', NULL, 6);
 
 
+-- Cards for Diana`s Deck 1 (deck_id = 7)
+INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
+                                                                               ('hello', 'привіт', 'a greeting', NULL, 7),
+                                                                               ('goodbye', 'до побачення', 'a farewell', NULL, 7),
+                                                                               ('please', 'будь ласка', 'a polite request', NULL, 7),
+                                                                               ('thank you', 'дякую', 'an expression of gratitude', NULL, 7),
+                                                                               ('sorry', 'вибачте', 'an apology', NULL, 7);
+-- Cards for Diana`s Deck 2 (deck_id = 8)
+INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
+                                                                               ('yes', 'так', 'an affirmative response', NULL, 8),
+                                                                               ('no', 'ні', 'a negative response', NULL, 8),
+                                                                               ('maybe', 'можливо', 'an uncertain response', NULL, 8),
+                                                                               ('help', 'допомога', 'assistance', NULL, 8),
+                                                                               ('stop', 'стоп', 'to cease movement or action', NULL, 8);
+-- Cards for Diana`s Deck 3 (deck_id = 9)
+INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
+                                                         ('Katze', 'кіт', 'a domestic animal that purrs', NULL, 9),
+                                                         ('Hund', 'пес', 'a loyal domestic animal', NULL, 9),
+                                                         ('Vogel', 'птах', 'an animal that can fly', NULL, 9),
+                                                         ('Fisch', 'риба', 'an animal that lives in water', NULL, 9),
+                                                         ('Maus', 'миша', 'a small rodent', NULL, 9);
+
+
+-- Cards for Iryna`s Deck 3 (deck_id = 10)
+INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
+                                                                               ('water', 'вода', 'a liquid essential for life', NULL, 10),
+                                                                               ('food', 'їжа', 'substance for nourishment', NULL, 10),
+                                                                               ('sleep', 'сон', 'a state of rest', NULL, 10),
+                                                                               ('play', 'грати', 'to engage in activity for enjoyment', NULL, 10),
+                                                                               ('work', 'робота', 'activity involving mental or physical effort', NULL, 10);
+
+-- Cards for Iryna`s Deck 2 (deck_id = 11)
+INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUES
+                                                         ('заєць', 'hare', 'a fast-running animal with long ears', NULL, 11),
+                                                         ('кіт', 'whale', 'a large marine mammal', NULL, 11),
+                                                         ('лев', 'lion', 'a large wild cat known as the king of the jungle', NULL, 11),
+                                                         ('панда', 'panda', 'a bear-like animal native to China', NULL, 11),
+                                                         ('слон', 'elephant', 'the largest land animal with a trunk', NULL, 11);
+
+
 INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
 VALUES (1, 1, 'created', 0, NULL, 1),
        (1, 2, 'created', 0, NULL, 1),
@@ -270,3 +338,36 @@ VALUES (1, 1, 'created', 0, NULL, 1),
        (1, 27, 'created', 0, NULL, 0),
        (1, 28, 'created', 0, NULL, 1),
        (1, 29, 'created', 0, NULL, 1);
+
+
+-- Diana`s progress
+INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
+VALUES (2, 30, 'created', 0, NULL, 0),
+               (2, 31, 'learning', 1, '2025-06-06 10:00:00', 0),
+               (2, 32, 'first', 1, '2025-06-06 10:00:00', 0),
+               (2, 33, 'second', 1, '2025-06-06 10:00:00', 0),
+               (2, 34, 'third', 1, NULL, 1),
+               (2, 35, 'third', 1, NULL, 1),
+               (2, 36, 'third', 1, NULL, 1),
+               (2, 37, 'third', 1, NULL, 1),
+               (2, 38, 'third', 1, NULL, 1),
+               (2, 39, 'third', 1, NULL, 1),
+               (2, 40, 'second', 1, '2025-06-07 10:00:00', 0),
+               (2, 41,  'second', 0, '2025-06-07 10:00:00', 0),
+               (2, 42,  'second', 0, '2025-06-07 10:00:00', 0),
+               (2, 43,  'second', 0, '2025-06-07 10:00:00', 0),
+               (2, 44,  'second', 1, '2025-06-07 10:00:00', 0);
+
+
+-- Iryna`s progress
+INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
+VALUES (3, 45, 'created', 0, NULL, 0),
+               (3, 46, 'learning', 1, '2025-06-06 10:00:00', 0),
+               (3, 47, 'first', 1, '2025-06-06 10:00:00', 0),
+               (3, 48, 'second', 1, '2025-06-06 10:00:00', 0),
+               (3, 49, 'third', 1, NULL, 1),
+               (3, 50, 'third', 1, NULL, 1),
+               (3, 51, 'third', 1, NULL, 1),
+               (3, 52, 'third', 1, NULL, 1),
+               (3, 53, 'third', 1, NULL, 1),
+               (3, 54, 'third', 1, NULL, 1);
