@@ -112,7 +112,11 @@ public class MainView extends VerticalLayout {
             System.out.println(card.getWord()+" "+card.getDeckId());
         }
 
-        for (Card card:cardService.getJam(userId,1)){
+        System.out.println(cardService.userHasCardsByLanguage(userId, 2));
+        System.out.println(cardService.userHasUnlearnedCardsByLanguage(userId, 2));
+
+
+        for (Card card:cardService.getJam(userId,2)){
             System.out.println(card.getWord()+" "+card.getDeckId()+" "+card.getId());
         }
         for (Language language : languageService.findLanguagesByUserId(userId)) {

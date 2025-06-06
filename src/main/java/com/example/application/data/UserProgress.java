@@ -37,6 +37,16 @@ public class UserProgress {
     public UserProgress() {
     }
 
+    public UserProgress(Integer userId, Integer cardId, String period, boolean isCorrect, boolean isLearned, LocalDateTime date, LocalDateTime nextDate) {
+        this.userId = userId;
+        this.cardId = cardId;
+        this.period = period;
+        this.isCorrect = isCorrect;
+        this.isLearned = isLearned;
+        this.date = date;
+        this.nextDate = nextDate;
+    }
+
     public UserProgress(Integer id, Integer userId, Integer cardId, String period, boolean isCorrect, boolean isLearned, LocalDateTime date, LocalDateTime nextDate) {
         this.id = id;
         this.userId = userId;

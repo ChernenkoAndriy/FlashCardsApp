@@ -2,7 +2,9 @@ package com.example.application.service;
 
 import com.example.application.data.Card;
 import com.example.application.data.User;
+import com.example.application.data.UserProgress;
 import com.example.application.repositories.CardRepository;
+import com.example.application.repositories.UserProgressRepository;
 import com.example.application.repositories.UserRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
@@ -17,10 +19,12 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
+    private final UserProgressRepository userProgressRepository;
 
-    public CardService(CardRepository cardRepository, UserRepository userRepository) {
+    public CardService(CardRepository cardRepository, UserRepository userRepository, UserProgressRepository userProgressRepository) {
         this.cardRepository = cardRepository;
         this.userRepository = userRepository;
+        this.userProgressRepository = userProgressRepository;
     }
 
     public List<Card> findAll() {
@@ -65,11 +69,11 @@ public class CardService {
             if (cardsInLearn.size() >= n - cardsForToday.size()) {
                 cardsInLearn = cardsInLearn.subList(0, n - cardsForToday.size());
             } else{*/
-                freshCards = cardRepository.findAllActiveCreatedByUserByLanguage(userId, languageId);
-                Collections.shuffle(freshCards);
-                if (freshCards.size() >= n - (cardsForToday.size())) {
-                    freshCards = freshCards.subList(0, n -(cardsForToday.size()));
-                }
+            freshCards = cardRepository.findAllActiveCreatedByUserByLanguage(userId, languageId);
+            Collections.shuffle(freshCards);
+            if (freshCards.size() >= n - (cardsForToday.size())) {
+                freshCards = freshCards.subList(0, n - (cardsForToday.size()));
+            }
             //}
         }
         List<Card> jam = new ArrayList<>();
@@ -81,6 +85,23 @@ public class CardService {
 
     public void save(Card card) {
         cardRepository.save(card);
+        System.out.println("inserted card with id: " + card.getId());
+        this.insertUserProgressForNewCard(card.getId(), card.getDeckId());
+    }
+
+    public void insertUserProgressForNewCard(Integer cardId, Integer deckId) {
+        List<Integer> userIds = userRepository.findUserIdsByDeckId(deckId);
+
+        List<UserProgress> progresses = userIds.stream().map(userId -> {
+            UserProgress up = new UserProgress();
+            up.setUserId(userId);
+            up.setCardId(cardId);
+            up.setPeriod("created");
+            up.setDate(LocalDateTime.now());
+            return up;
+        }).toList();
+
+        userProgressRepository.saveAll(progresses);
     }
 
     public void delete(Card card) {

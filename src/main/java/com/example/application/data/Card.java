@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 public class Card {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "`id`", nullable = false)
     private Integer id;
 

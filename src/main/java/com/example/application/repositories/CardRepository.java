@@ -5,6 +5,7 @@ import com.example.application.dto.DeckDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +46,10 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
                 WHERE EXISTS (
                     SELECT 1
                     FROM UserProgress u
-                    WHERE u.cardId =c.id AND u.isLearned = FALSE AND u.userId = :userId)
-                 AND d.languageId = :languageId
+                    WHERE u.cardId =c.id AND u.userId = :userId AND u.isLearned)
+                  AND d.languageId = :languageId
             """)
-    List<Card> findAllUnlearnedByUserByLanguage(Integer id, Integer languageId);
+    List<Card> findAllUnlearnedByUserByLanguage(Integer userId, Integer languageId);
 
 
     @Modifying
@@ -100,5 +101,6 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
             WHERE ud.userId = :userId AND p.userId = :userId AND ud.isActive = true AND d.languageId=:languageId AND p.isLearned = false AND p.period='created'
             """)
     List<Card> findAllActiveCreatedByUserByLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId);
+
 
 }
