@@ -1,17 +1,16 @@
 package com.example.application.repositories;
 
 import com.example.application.data.Card;
-import com.example.application.dto.DeckDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, Integer> {
@@ -101,6 +100,14 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
             WHERE ud.userId = :userId AND p.userId = :userId AND ud.isActive = true AND d.languageId=:languageId AND p.isLearned = false AND p.period='created'
             """)
     List<Card> findAllActiveCreatedByUserByLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId);
+
+
+    @Query("""
+            SELECT c
+            FROM Card c
+            WHERE c.id = :id
+            """)
+    Optional<Card> findById(Integer id);
 
 
 }

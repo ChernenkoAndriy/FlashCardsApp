@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CardService {
@@ -25,6 +26,10 @@ public class CardService {
         this.cardRepository = cardRepository;
         this.userRepository = userRepository;
         this.userProgressRepository = userProgressRepository;
+    }
+
+    public Optional<Card> findById(Integer id) {
+        return cardRepository.findById(id);
     }
 
     public List<Card> findAll() {
