@@ -1,12 +1,12 @@
 package com.example.application.data;
 
-public class PracticeResponse {
+public class AIResponse {
     private String cardWord;
     private String userSentence;
     private String aiFeedback;
     private boolean isCorrect;
 
-    public PracticeResponse(String cardWord, String userSentence, String aiFeedback) {
+    public AIResponse(String cardWord, String userSentence, String aiFeedback) {
         this.cardWord = cardWord;
         this.userSentence = userSentence;
         this.aiFeedback = aiFeedback;
