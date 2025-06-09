@@ -1,12 +1,14 @@
 package com.example.application.views.MainView;
 
 import com.example.application.dto.DeckDto;
+import com.example.application.views.GameView.GameMode;
 import com.example.application.views.MainView.Buttons.DeleteButton;
 import com.example.application.views.MainView.Buttons.EditButton;
 import com.example.application.views.MainView.Buttons.PlayButton;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class DequeRow extends HorizontalLayout {
@@ -25,7 +27,7 @@ public class DequeRow extends HorizontalLayout {
     public DequeRow(DeckDto deckDto,
                     Consumer<DeckDto> onDelete,
                     Consumer<DeckDto> onEdit,
-                    Consumer<DeckDto> onPlay) {
+                    BiConsumer<DeckDto, GameMode> onPlay) {
         this.dequeCard = new DequeCard(deckDto);
         initializeComponents(deckDto, onDelete, onEdit, onPlay);
         configureLayout();
@@ -35,7 +37,7 @@ public class DequeRow extends HorizontalLayout {
     private void initializeComponents(DeckDto deckDto,
                                       Consumer<DeckDto> onDelete,
                                       Consumer<DeckDto> onEdit,
-                                      Consumer<DeckDto> onPlay) {
+                                      BiConsumer<DeckDto, GameMode> onPlay) {
 
         deleteButton = new DeleteButton(deckDto, onDelete);
         editButton   = new EditButton(deckDto, onEdit);

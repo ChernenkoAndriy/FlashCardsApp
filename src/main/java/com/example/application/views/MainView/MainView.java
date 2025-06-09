@@ -8,6 +8,7 @@ import com.example.application.service.DeckService;
 import com.example.application.service.LanguageService;
 import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
+import com.example.application.views.GameView.GameMode;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
@@ -18,6 +19,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,9 +160,14 @@ public class MainView extends VerticalLayout {
     void editDeck(DeckDto deckDto) {
         getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + deckDto.getId()));
     }
-    void playDeck(DeckDto deckDto) {
-
+    void playDeck(DeckDto deckDto, GameMode gameMode) {
+        getUI().ifPresent(ui -> {
+            String deckId = URLEncoder.encode(deckDto.getId().toString(), StandardCharsets.UTF_8);
+            String mode = URLEncoder.encode(gameMode.name(), StandardCharsets.UTF_8);
+            ui.navigate("game?deckId=" + deckId + "&mode=" + mode);
+        });
     }
+
     void createDeck() {
         updateDecksData();
         configureDeckLists();

@@ -10,6 +10,10 @@
     --lumo-secondary-color: #7C3AED;
     --lumo-secondary-color-50pct: #7C3AED80; /* rgba(124, 58, 237, 0.5) */
     --lumo-secondary-color-10pct: #7C3AED1A; /* rgba(124, 58, 237, 0.1) */
+
+    --lumo-success-color: #3f9f00; /* світло-салатовий */
+    --lumo-success-color-50pct: rgba(56, 129, 0, 0.5);
+    --lumo-success-text-color: #153900; /* темніший текст для контрасту */
 }
 
 [theme~="dark"] {
@@ -92,6 +96,28 @@ vaadin-button:hover {
 .opaque-progress vaadin-progress-bar {
     opacity: 1 !important;
 }
+.card-flip {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    overflow: hidden;
+    color: white;
+}
+
+.card-back {
+    transform: rotateY(180deg);
+}
+
 
 
 
