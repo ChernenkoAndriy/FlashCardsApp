@@ -4,16 +4,20 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
 import java.util.function.Consumer;
 
 
 public class ButtonLayout extends BottomLayout {
+    protected Consumer<Void> onSuccess;
+    protected Consumer<Void> onFail;
     private H2 label = new H2("Have you guessed the word?");
     private Button success = new Button("Yes");
     private Button cancel = new Button("No");
+
+
     public ButtonLayout(Consumer<Void> onSuccess, Consumer<Void> onFail) {
-        super(onSuccess, onFail);
+            this.onSuccess = onSuccess;
+            this.onFail = onFail;
         success.addClickListener(e -> onSuccess.accept(null));
         cancel.addClickListener(e -> onFail.accept(null));
         setHeightFull();

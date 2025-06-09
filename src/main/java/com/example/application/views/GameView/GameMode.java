@@ -4,5 +4,4 @@ public enum GameMode {
     REVISION,
     DEFINITIONS,
     SENTENCES
-    //USAGE
 }

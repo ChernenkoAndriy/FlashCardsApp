@@ -1,8 +1,12 @@
 package com.example.application.views.GameView;
 
 import com.example.application.data.Card;
+import com.example.application.service.AIService;
 import com.example.application.service.CardService;
 import com.example.application.views.Components.MainLayout;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
@@ -12,15 +16,13 @@ import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 @RolesAllowed({"ADMIN", "USER"})
 @Route(value = "game", layout = MainLayout.class)
 @PageTitle("Game | SLEEVE")
-public class GameView extends VerticalLayout implements BeforeEnterObserver {
+public class GameView extends VerticalLayout implements BeforeEnterObserver{
     private Queue<Task> tasks = new LinkedList<>();
     private GameCard gameCard = new GameCard();
-    private BottomLayout layout;
-    private HorizontalLayout bottom = new HorizontalLayout();
+    private final HorizontalLayout bottom = new HorizontalLayout();
     private CardService cardService;
     private Task currentTask;
     private Integer deckId;
@@ -28,14 +30,16 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private int score;
     private int currentTaskIndex;
     private int decksize;
-
+    private AIService aiService;
+    private ButtonLayout currentButtonLayout;
+    private SentenceLayout currentSentenceLayout;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Autowired
-    public GameView(CardService service) {
+    public GameView(CardService service, AIService aiService) {
         cardService = service;
+        this.aiService=aiService;
     }
-
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         QueryParameters params = event.getLocation().getQueryParameters();
@@ -58,12 +62,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             setSizeFull();
             setStyle();
             gameCard.setVisible(true);
-            gameCard.addClickListener(clickevent -> {
-                if(!gameCard.isFlipped()) {
-                    gameCard.flipCard();
-                    layout.flipVisibility();
-                }
-            });
             initialize(deckId, gameMode);
         } catch (NumberFormatException e) {
             throw new RuntimeException("Invalid format for deckId: must be an integer", e);
@@ -79,41 +77,59 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             tasks.add(new Task(card, gameMode));
         }
         currentTaskIndex = 0;
-        nextTask();
-    }
-    private void setTask(Task task) {
-        gameCard.setTask(task);
-        if (task.getGameMode() == GameMode.SENTENCES) {
-            layout = new SentenceLayout(v -> taskSuccess(), v -> taskFail());
-        } else {
-            layout = new ButtonLayout(v -> taskSuccess(), v -> taskFail());
-        }
-        layout.setSizeFull();
-        bottom.add(layout);
-    }
-    private void nextTask() {
-        if (tasks.isEmpty()) {
-            gameFinished();
-            return;
-        }
         currentTask = tasks.poll();
+
+        gameCard.addClickListener(clickevent -> {
+
+                gameCard.flipCard();
+                handleCardFlip();
+        });
+
         setTask(currentTask);
         gameCard.appearNormal();
     }
+
+    private void setTask(Task task) {
+        gameCard.setTask(task);
+        if (task.getGameMode() == GameMode.SENTENCES) {
+          addSentenceLayout(task);
+        } else {
+           addButtonLayout();
+        }
+            }
+
+    private void validateInventedSentence(String answer, String word) {
+        String chatAnswer = aiService.checkSentenceWithCardWord(word, answer);
+        if(chatAnswer.contains("The sentence is correct")){
+            taskSuccess();
+        }else{
+
+            Notification.show(chatAnswer, 8000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+
+            taskFail();
+        }
+    }
+
+    // У GameView.java змініть ці методи:
+
     private void taskFail() {
         bottom.removeAll();
         gameCard.flipCard();
-        //tasks.add(currentTask);
+        if(currentTask.getGameMode() == GameMode.REVISION ||currentTask.getGameMode() == GameMode.DEFINITIONS) {
+            tasks.add(currentTask);
+        }
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;
             currentTaskIndex++;
-            gameCard.transitionToNewTask(currentTask, false);
-            scheduleBottomLayoutUpdate();
-        } else {
-            gameFinished();
+            gameCard.transitionToNewTask(currentTask, false, () -> {
+                setTask(currentTask);
+                bottom.setVisible(true);
+            });
         }
     }
+
     private void taskSuccess() {
         bottom.removeAll();
         gameCard.flipCard();
@@ -124,16 +140,13 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         if (nextTask != null) {
             currentTask = nextTask;
             currentTaskIndex++;
-            gameCard.transitionToNewTask(currentTask, true);
-            scheduleBottomLayoutUpdate();
+            gameCard.transitionToNewTask(currentTask, true, () -> {
+                setTask(currentTask);
+                bottom.setVisible(true);
+            });
         } else {
             gameFinished();
         }
-    }
-    private void scheduleBottomLayoutUpdate() {
-        scheduler.schedule(() -> getUI().ifPresent(ui -> ui.access(() -> {
-            setTask(currentTask);
-        })), 600, TimeUnit.MILLISECONDS);
     }
     private void gameFinished() {
         GameFinishScreen finishedScreen = new GameFinishScreen(
@@ -165,4 +178,37 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         bottom.setHeight("15%");
         add(bottom);
     }
+    private void handleCardFlip() {
+        if (currentTask.getGameMode() == GameMode.SENTENCES) {
+
+        } else {
+            if (currentButtonLayout != null) {
+                currentButtonLayout.flipVisibility();
+            }
+        }
+    }
+
+    private void addButtonLayout(){
+        bottom.removeAll();
+        bottom.setVisible(false);
+        currentButtonLayout = new ButtonLayout(v -> taskSuccess(), v -> taskFail());
+        currentSentenceLayout = null;
+        bottom.add(currentButtonLayout);
+        bottom.setVisible(true);
+        bottom.add(currentButtonLayout);
+    }
+
+    private void addSentenceLayout(Task task){
+        bottom.removeAll();
+        bottom.setVisible(false);
+        currentSentenceLayout = new SentenceLayout();
+        currentButtonLayout = null;
+        currentSentenceLayout.getSubmit().addClickListener(clickevent -> {
+            validateInventedSentence(currentSentenceLayout.getAnswer(), task.getCard().getWord());
+        });
+        bottom.add(currentSentenceLayout);
+        bottom.setVisible(true);
+    }
+
+
 }

@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,26 +26,6 @@ public interface UserProgressRepository extends JpaRepository<UserProgress, Inte
             
             """, nativeQuery = true)
     void updateProgresses(Integer cardId, Integer deckId);
-
-    UserProgress findByUserIdAndCardId(Integer userId, Integer cardId);
-
-    @Transactional
-    @Modifying
-    @Query("""
-            UPDATE UserProgress up
-            SET up.period = :newPeriod, up.nextDate = :nextDate
-            WHERE up.cardId = :cardId AND up.userId = :userId
-            """)
-    void updatePeriod(Integer cardId, Integer userId, LocalDateTime nextDate, String newPeriod);
-
-    @Transactional
-    @Modifying
-    @Query("""
-            UPDATE UserProgress up
-            SET up.isLearned = TRUE, up.nextDate = NULL
-            WHERE up.cardId = :cardId AND up.userId = :userId
-            """)
-    void setLearned(Integer cardId, Integer userId);
 
 //    public void nextStageForCardById(@Param("userId") Integer userId, @Param("cardId") Integer cardId);
 

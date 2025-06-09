@@ -2,7 +2,6 @@ package com.example.application.views.DeckEditor;
 
 import com.example.application.data.Card;
 import com.example.application.data.Deck;
-import com.example.application.dto.CardDto;
 import com.example.application.service.CardService;
 import com.example.application.service.DeckService;
 import com.example.application.views.Components.MainLayout;
@@ -13,7 +12,6 @@ import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-
 @RolesAllowed({"ADMIN", "USER"})
 @Route(value = "editor", layout = MainLayout.class)
 @PageTitle("DeckEditor | SLEEVE")
@@ -30,15 +28,7 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
         this.cardService = cardService;
         this.deckService = deckService;
 
-        form = new CreatorForm(card -> {
-            card.setDeckId(deck.getId()); // Обов’язково!
-            cardService.save(card);       // Зберігає сутність
-
-            refreshTable();               // Оновлює DTO у таблиці
-        }, card -> {
-            cardService.delete(card);
-            refreshTable();
-        });
+        form = new CreatorForm(this::saveCard, this::deleteCard);
 
         configureStyle();
         configureComponents();
@@ -77,24 +67,14 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
 
     private void refreshTable() {
         if (deck != null) {
-            List<CardDto> cards = cardService.findCardDtosByUserAndDeckId(3, deck.getId()); //TODO реальний ID користувача
+            List<Card> cards = cardService.findByDeckId(deck.getId());
             table.setItems(cards);
         }
     }
 
     private void configureComponents() {
         table.addSelectionListener(event -> {
-            event.getFirstSelectedItem().ifPresent(dto -> {
-                cardService.findById(dto.getId()).ifPresent(originalCard -> {
-                    Card copy = new Card();
-                    copy.setId(originalCard.getId());
-                    copy.setWord(originalCard.getWord());
-                    copy.setTranslate(originalCard.getTranslate());
-                    copy.setDefinition(originalCard.getDefinition());
-                    copy.setImage(originalCard.getImage());
-                    form.setCard(copy);
-                });
-            });
+            form.setCard(event.getFirstSelectedItem().orElse(new Card()));
         });
     }
 
@@ -141,7 +121,7 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
     }
 
     // Для тестових даних - можна закоментувати чи видалити, коли будуть реальні дані
-    /*private void loadTestCards() {
+    private void loadTestCards() {
         List<Card> fakeCards = new java.util.ArrayList<>();
         for (int i = 1; i <= 1000; i++) {
             fakeCards.add(new Card(
@@ -153,5 +133,5 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
             ));
         }
         table.setItems(fakeCards);
-    }*/
+    }
 }

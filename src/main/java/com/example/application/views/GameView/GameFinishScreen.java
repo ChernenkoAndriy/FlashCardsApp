@@ -11,11 +11,13 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 
 public class GameFinishScreen extends Div {
 
     public GameFinishScreen(int score, int totalCards, GameMode gameMode, Runnable onBackToMenu) {
         setSizeFull();
+        addClassName(LumoUtility.Background.CONTRAST_5); // Background respects theme
 
         // Layout
         VerticalLayout mainLayout = new VerticalLayout();
@@ -27,17 +29,11 @@ public class GameFinishScreen extends Div {
 
         // Title
         H1 title = new H1("Game Completed");
-        title.getStyle()
-                .set("font-size", "3rem")
-                .set("font-weight", "bold")
-                .set("margin", "0")
-                .set("color", "black");
+        title.addClassNames(LumoUtility.FontSize.XXXLARGE, LumoUtility.FontWeight.BOLD, "finish-title");
 
         // Subtitle
         H2 performance = new H2(getPerformanceLevel(score, totalCards));
-        performance.getStyle()
-                .set("color", "#666")
-                .set("margin-top", "0.5rem");
+        performance.addClassNames(LumoUtility.TextColor.SECONDARY, "finish-subtitle");
 
         // Stats
         HorizontalLayout statsLayout = new HorizontalLayout();
@@ -55,9 +51,10 @@ public class GameFinishScreen extends Div {
         Span mode = new Span("Mode: " + gameMode);
         mode.getStyle().set("margin-top", "1rem").set("font-weight", "500").set("text-transform", "uppercase");
 
-        // Only one button: Back to Menu
+        // Back button
         Button backBtn = new Button("Back to Menu", e -> onBackToMenu.run());
         backBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
         mainLayout.add(title, performance, statsLayout, mode, backBtn);
         add(mainLayout);
     }
@@ -68,10 +65,11 @@ public class GameFinishScreen extends Div {
         card.setSpacing(false);
         card.setPadding(false);
         card.getStyle()
-                .set("border", "2px solid black")
+                .set("border", "2px solid var(--lumo-contrast-30)")
                 .set("padding", "1rem")
                 .set("min-width", "120px")
-                .set("background", "#f0f0f0");
+                .set("background-color", "var(--lumo-base-color)")
+                .set("border-radius", "8px");
 
         Icon iconComponent = new Icon(icon);
         iconComponent.setSize("24px");

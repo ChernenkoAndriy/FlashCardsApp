@@ -1,5 +1,6 @@
 package com.example.application.security;
 
+import com.example.application.repositories.UserRepository;
 import com.example.application.views.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-//сюди просто не лізье плз
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
@@ -38,13 +38,8 @@ public class SecurityConfig extends VaadinWebSecurity {
     }
 
     @Bean
-    public UserDetailsService users() {
-        UserDetails admin = User.builder()
-                .username("cyberanalyst")
-                .password(passwordEncoder().encode("cisco"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(admin);
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return new CustomUserDetailsService(userRepository, passwordEncoder());
     }
+
 }

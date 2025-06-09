@@ -15,6 +15,15 @@ public class GameCard extends VerticalLayout {
         return flipped;
     }
 
+    public boolean isFlippable() {
+        return isFlippable;
+    }
+
+    public void setFlippable(boolean flippable) {
+        isFlippable = flippable;
+    }
+
+    private boolean isFlippable = true;
     private boolean flipped = false;
 
     public GameCard() {
@@ -30,7 +39,11 @@ public class GameCard extends VerticalLayout {
     }
 
     // Об'єднаний метод для анімації переходу з новим завданням
-    public void transitionToNewTask(Task newTask, boolean wasSuccess) {
+    // Оновлений метод transitionToNewTask у GameCard.java
+
+    // У GameCard.java змініть метод transitionToNewTask:
+
+    public void transitionToNewTask(Task newTask, boolean wasSuccess, Runnable onFinishCallback) {
         String colorVar = wasSuccess ? "--lumo-success-color" : "--lumo-error-color";
         String contrastVar = wasSuccess ? "--lumo-success-contrast-color" : "--lumo-error-contrast-color";
 
@@ -60,7 +73,7 @@ public class GameCard extends VerticalLayout {
                             front.style.color = 'white';
                             
                             el.style.transition = 'none';
-                            el.style.transform = 'translateX(-150vw)';
+                            el.style.transform = 'translateX(150vw)';
                             
                             // Форсуємо перерахунок
                             void el.offsetHeight;
@@ -69,21 +82,39 @@ public class GameCard extends VerticalLayout {
                             setTimeout(() => {
                                 el.style.transition = 'transform 0.4s ease-out';
                                 el.style.transform = 'translateX(0)';
+                                
+                                // Повідомляємо про завершення появи
+                                el.addEventListener('transitionend', function showHandler(event) {
+                                    if (event.propertyName === 'transform') {
+                                        el.removeEventListener('transitionend', showHandler);
+                                        el.dispatchEvent(new CustomEvent('cardShown'));
+                                    }
+                                });
                             }, 50);
                             
-                        }, 100);
+                        }, 100);             
                     }
                 });
                 """,
                 colorVar, contrastVar
         );
 
-        // Слухаємо подію про готовність до оновлення контенту
+        // Слухач для оновлення контенту картки
         cardFlip.getElement().addEventListener("cardHidden", e -> {
-            setTask(newTask);
+            getUI().ifPresent(ui -> ui.access(() -> {
+                setTask(newTask);
+            }));
+        });
+
+        // Слухач для виконання callback після завершення анімації
+        cardFlip.getElement().addEventListener("cardShown", e -> {
+            getUI().ifPresent(ui -> ui.access(() -> {
+                if (onFinishCallback != null) {
+                    onFinishCallback.run();
+                }
+            }));
         });
     }
-
     // Спрощений метод для першої появи
     public void appearNormal() {
         cardFlip.getElement().executeJs(
@@ -103,40 +134,8 @@ public class GameCard extends VerticalLayout {
                 """
         );
     }
-
-    // Старий метод hideCard залишається для сумісності
-    public void hideCard(boolean success) {
-        String colorVar = success ? "--lumo-success-color" : "--lumo-error-color";
-        String contrastVar = success ? "--lumo-success-contrast-color" : "--lumo-error-contrast-color";
-
-        cardFlip.getElement().executeJs(
-                """
-                const el = this;
-                const front = el.querySelector('.card-front');
-        
-                front.style.backgroundColor = getComputedStyle(document.documentElement).getPropertyValue($0);
-                front.style.color = getComputedStyle(document.documentElement).getPropertyValue($1);
-        
-                el.style.transition = 'none';
-                el.style.transform = 'translateX(0)';
-        
-                void el.offsetHeight;
-        
-                el.style.transition = 'transform 0.4s ease-in';
-                el.style.transform = 'translateX(-150vw)';
-        
-                el.addEventListener('transitionend', function handler(event) {
-                    if (event.propertyName === 'transform') {
-                        el.removeEventListener('transitionend', handler);
-                        console.log('Анімація завершена');
-                    }
-                });
-                """,
-                colorVar, contrastVar
-        );
-    }
-
     public void flipCard() {
+        if (!isFlippable) return;
         if (flipped) {
             cardFlip.getStyle().set("transform", "rotateY(0deg)");
             flipped = false;
@@ -153,17 +152,23 @@ public class GameCard extends VerticalLayout {
         mainLayout.setAlignItems(Alignment.CENTER);
         backLayout.setAlignItems(Alignment.CENTER);
 
-        // Front side content (mainLayout)
         Div frontText = new Div();
         if (mode == GameMode.REVISION) {
             frontText.setText(card.getTranslate());
+            setFlippable(true);
         } else if (mode == GameMode.DEFINITIONS) {
             frontText.setText(card.getDefinition());
+            setFlippable(true);
+        } else if (mode == GameMode.SENTENCES) {
+            frontText.setText(card.getWord());
+            if(flipped){
+                flipCard();
+            }
+            setFlippable(false);
         }
         setupTextDiv(frontText);
         mainLayout.add(frontText);
 
-        // Back side content (backLayout)
         if (card.getImage() != null && !card.getImage().isEmpty()) {
             Image image = new Image(card.getImage(), "Card Image");
             image.setMaxHeight("60%");
@@ -222,10 +227,8 @@ public class GameCard extends VerticalLayout {
     }
 
     private void setStyle() {
-        // Стилі для GameCard контейнера (this)
         getStyle().set("perspective", "1000px");
 
-        // cardFlip стилі
         cardFlip.addClassName("card-flip");
         cardFlip.getStyle()
                 .set("width", "100%")
@@ -261,4 +264,4 @@ public class GameCard extends VerticalLayout {
                 .set("color", "white")
                 .set("transform", "rotateY(180deg)");
     }
-}
+   }
