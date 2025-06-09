@@ -3,9 +3,11 @@ package com.example.application.service;
 import com.example.application.data.Card;
 import com.example.application.data.User;
 import com.example.application.data.UserProgress;
+import com.example.application.dto.CardDto;
 import com.example.application.repositories.CardRepository;
 import com.example.application.repositories.UserProgressRepository;
 import com.example.application.repositories.UserRepository;
+import com.example.application.views.GameView.GameMode;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +89,56 @@ public class CardService {
         Collections.shuffle(jam);
         return jam;
     }
+
+    public void markGuessed(GameMode gameMode, Card card, Integer userId) {
+        UserProgress userProgress = userProgressRepository.findByUserIdAndCardId(userId, card.getId());
+        String period = userProgress.getPeriod();
+        switch (period) {
+            case "learning":{
+                if (gameMode.equals(GameMode.REVISION)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(1), "first");
+                } else if (gameMode.equals(GameMode.DEFINITIONS)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(3), "second");
+                } else if (gameMode.equals(GameMode.SENTENCES)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
+                } /*else if (gameMode.equals(GameMode.USAGE)){
+                    userProgressRepository.setLearned(card.getId(), userId);
+                }*/
+                break;
+            }
+            case "first":{
+                 if (gameMode.equals(GameMode.DEFINITIONS)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(3), "second");
+                } else if (gameMode.equals(GameMode.SENTENCES)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
+                } /*else if (gameMode.equals(GameMode.USAGE)){
+                    userProgressRepository.setLearned(card.getId(), userId);
+                }*/
+                break;
+            }
+            case "second":{
+                if (gameMode.equals(GameMode.SENTENCES)){
+                    userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
+                } /*else if (gameMode.equals(GameMode.USAGE)){
+                    userProgressRepository.setLearned(card.getId(), userId);
+                }*/
+                //TODO коли буде режим 3
+                break;
+            }
+            case "third":{
+                /* if (gameMode.equals(GameMode.USAGE)){
+                    userProgressRepository.setLearned(card.getId(), userId);
+                }*/
+                //TODO коли буде режим 4
+                break;
+            }
+        }
+    }
+
+    public List<CardDto> findCardDtosByUserAndDeckId(@Param("userId") Integer userId, @Param("deckId") Integer deckId){
+        return cardRepository.findCardDtosByUserAndDeckId(userId, deckId);
+    }
+
 
     public void save(Card card) {
         cardRepository.save(card);

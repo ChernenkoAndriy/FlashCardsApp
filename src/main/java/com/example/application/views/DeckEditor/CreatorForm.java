@@ -72,6 +72,7 @@ public class CreatorForm extends VerticalLayout {
         delete.addClickListener(event -> {
             if (card != null) {
                 onDelete.accept(card);
+                setCard(new Card());
             }
         });
     }

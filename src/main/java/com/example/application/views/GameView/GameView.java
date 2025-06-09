@@ -103,13 +103,15 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private void taskFail() {
         bottom.removeAll();
         gameCard.flipCard();
-        tasks.add(currentTask);
+        //tasks.add(currentTask);
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;
             currentTaskIndex++;
             gameCard.transitionToNewTask(currentTask, false);
             scheduleBottomLayoutUpdate();
+        } else {
+            gameFinished();
         }
     }
     private void taskSuccess() {

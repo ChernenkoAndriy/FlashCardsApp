@@ -2,6 +2,7 @@ package com.example.application.views.DeckEditor;
 
 import com.example.application.data.Card;
 import com.example.application.data.Deck;
+import com.example.application.dto.CardDto;
 import com.example.application.service.CardService;
 import com.example.application.service.DeckService;
 import com.example.application.views.Components.MainLayout;
@@ -29,7 +30,15 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
         this.cardService = cardService;
         this.deckService = deckService;
 
-        form = new CreatorForm(this::saveCard, this::deleteCard);
+        form = new CreatorForm(card -> {
+            card.setDeckId(deck.getId()); // Обов’язково!
+            cardService.save(card);       // Зберігає сутність
+
+            refreshTable();               // Оновлює DTO у таблиці
+        }, card -> {
+            cardService.delete(card);
+            refreshTable();
+        });
 
         configureStyle();
         configureComponents();
@@ -68,14 +77,16 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
 
     private void refreshTable() {
         if (deck != null) {
-            List<Card> cards = cardService.findByDeckId(deck.getId());
+            List<CardDto> cards = cardService.findCardDtosByUserAndDeckId(3, deck.getId()); //TODO реальний ID користувача
             table.setItems(cards);
         }
     }
 
     private void configureComponents() {
         table.addSelectionListener(event -> {
-            form.setCard(event.getFirstSelectedItem().orElse(new Card()));
+            event.getFirstSelectedItem().ifPresent(dto -> {
+                cardService.findById(dto.getId()).ifPresent(form::setCard);
+            });
         });
     }
 
@@ -122,7 +133,7 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
     }
 
     // Для тестових даних - можна закоментувати чи видалити, коли будуть реальні дані
-    private void loadTestCards() {
+    /*private void loadTestCards() {
         List<Card> fakeCards = new java.util.ArrayList<>();
         for (int i = 1; i <= 1000; i++) {
             fakeCards.add(new Card(
@@ -134,5 +145,5 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
             ));
         }
         table.setItems(fakeCards);
-    }
+    }*/
 }
