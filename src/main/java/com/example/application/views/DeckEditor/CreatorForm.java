@@ -61,7 +61,9 @@ public class CreatorForm extends VerticalLayout {
                     card = new Card();
                 }
                 try {
+                    Card target = card;
                     binder.writeBean(card);
+                    System.out.println("Saving card with id: " + target.getId()); // 🔍 логування ID
                     onSave.accept(card);
                     setCard(new Card());
                 } catch (Exception e) {

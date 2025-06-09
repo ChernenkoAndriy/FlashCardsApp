@@ -85,7 +85,15 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
     private void configureComponents() {
         table.addSelectionListener(event -> {
             event.getFirstSelectedItem().ifPresent(dto -> {
-                cardService.findById(dto.getId()).ifPresent(form::setCard);
+                cardService.findById(dto.getId()).ifPresent(originalCard -> {
+                    Card copy = new Card();
+                    copy.setId(originalCard.getId());
+                    copy.setWord(originalCard.getWord());
+                    copy.setTranslate(originalCard.getTranslate());
+                    copy.setDefinition(originalCard.getDefinition());
+                    copy.setImage(originalCard.getImage());
+                    form.setCard(copy);
+                });
             });
         });
     }

@@ -147,18 +147,21 @@ public class CardService {
     }
 
     public void insertUserProgressForNewCard(Integer cardId, Integer deckId) {
-        List<Integer> userIds = userRepository.findUserIdsByDeckId(deckId);
+        Optional<Card> presentCard = cardRepository.findById(cardId);
+        if (!presentCard.isPresent()) {
+            List<Integer> userIds = userRepository.findUserIdsByDeckId(deckId);
 
-        List<UserProgress> progresses = userIds.stream().map(userId -> {
-            UserProgress up = new UserProgress();
-            up.setUserId(userId);
-            up.setCardId(cardId);
-            up.setPeriod("created");
-            up.setDate(LocalDateTime.now());
-            return up;
-        }).toList();
+            List<UserProgress> progresses = userIds.stream().map(userId -> {
+                UserProgress up = new UserProgress();
+                up.setUserId(userId);
+                up.setCardId(cardId);
+                up.setPeriod("created");
+                up.setDate(LocalDateTime.now());
+                return up;
+            }).toList();
 
-        userProgressRepository.saveAll(progresses);
+            userProgressRepository.saveAll(progresses);
+        }
     }
 
     public void delete(Card card) {
