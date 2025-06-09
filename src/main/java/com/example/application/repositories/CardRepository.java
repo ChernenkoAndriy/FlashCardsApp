@@ -1,12 +1,16 @@
+
 package com.example.application.repositories;
 
 import com.example.application.data.Card;
+import com.example.application.dto.DeckDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.application.dto.CardDto;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -108,6 +112,16 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
             WHERE c.id = :id
             """)
     Optional<Card> findById(Integer id);
+
+
+    @Query("""
+                SELECT DISTINCT new com.example.application.dto.CardDto(c.id, c.word, c.translate, c.definition, c.image, p.period)
+                FROM Card c
+                JOIN UserProgress p ON p.cardId = c.id
+                WHERE p.userId = :userId AND c.deckId = :deckId
+            """)
+    List<CardDto> findCardDtosByUserAndDeckId(@Param("userId") Integer userId, @Param("deckId") Integer deckId);
+
 
 
 }
