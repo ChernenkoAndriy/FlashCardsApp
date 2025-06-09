@@ -50,6 +50,36 @@ public class AIService {
                 .content();
     }
 
+    public String checkUserWordChoice(Card originalCard, String aiGeneratedSentence, String userAttempt) {
+        var client = chatClientBuilder.build();
+        String sentenceWithUserAttempt = aiGeneratedSentence.replace("... [" + originalCard.getDefinition() + "]", userAttempt);
+
+        String aiPrompt = "You are an English language expert and a fair evaluator. " +
+                "A student was given the following sentence with a blank: " +
+                "\"" + aiGeneratedSentence + "\"\n" +
+                "The student attempted to fill the blank with the word: \"" + userAttempt + "\".\n" +
+                "The original, correct word for this blank was: \"" + originalCard.getWord() + "\".\n\n" +
+                "Evaluate the student's attempt. Consider the following:\n" +
+                "1. Is \"" + userAttempt + "\" the same word (or a grammatically correct form) as the original word \"" + originalCard.getWord() + "\"?\n" +
+                "2. Is the sentence with the student's word (" + sentenceWithUserAttempt + ") grammatically correct?\n" +
+                "3. Does \"" + userAttempt + "\" fit the meaning implied by the original definition ('" + originalCard.getDefinition() + "') in the sentence context?\n\n" +
+                "Respond in one of the following ways:\n" +
+                "- If the user's word is exactly the original word (or a correctly inflected form) and the sentence is grammatically perfect with it: " +
+                "  \"The sentence is correct.\"\n" +
+                "- If the user's word is not correct (either wrong word or wrong form), or if the sentence is grammatically incorrect with it: " +
+                "  \"Not quite. The correct word is '" + originalCard.getWord() + "'. Your sentence with your word was: '" + sentenceWithUserAttempt + "'. " +
+                "  The correct sentence would be: '" + aiGeneratedSentence.replace("... [" + originalCard.getDefinition() + "]", originalCard.getWord()) + "'. " +
+                "  Explanation: [Brief explanation of why the user's word was incorrect, focusing on grammar or meaning incompatibility, or why a different form of the original word is needed].\"" +
+                "  For example, if the original word was 'treasure' and the user put 'treasures', and the sentence needed 'treasure': " +
+                "  \"Not quite. The correct word is 'treasure'. Your sentence with your word was: 'Stories about pirates often include a search for buried treasures.'. " +
+                "  The correct sentence would be: 'Stories about pirates often include a search for buried treasure.'. " +
+                "  Explanation: While 'treasures' is a valid word, the sentence context implies a singular 'treasure' (valuable thing) as a mass noun here, or if the original intended a singular noun.";
+
+        return client.prompt(aiPrompt)
+                .call()
+                .content();
+    }
+}
 
 
 }
