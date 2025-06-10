@@ -1,9 +1,12 @@
 package com.example.application.views.GameView;
 
 import com.example.application.data.Card;
+import com.example.application.data.User;
+import com.example.application.data.UserProgress;
 import com.example.application.security.SecurityService;
 import com.example.application.service.AIService;
 import com.example.application.service.CardService;
+import com.example.application.service.UserProgressService;
 import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
 import com.vaadin.flow.component.notification.Notification;
@@ -21,6 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 @Route(value = "game", layout = MainLayout.class)
 @PageTitle("Game | SLEEVE")
 public class GameView extends VerticalLayout implements BeforeEnterObserver {
+    private final UserProgressService userProgressService;
     private Queue<Task> tasks = new LinkedList<>();
     private GameCard gameCard = new GameCard();
     private final HorizontalLayout bottom = new HorizontalLayout();
@@ -38,11 +42,12 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private final UserService userService;
 
     @Autowired
-    public GameView(CardService service, AIService aiService, SecurityService securityService, UserService userService) {
+    public GameView(CardService service, AIService aiService, SecurityService securityService, UserService userService, UserProgressService userProgressService) {
         cardService = service;
         this.aiService = aiService;
         this.securityService = securityService;
         this.userService = userService;
+        this.userProgressService = userProgressService;
     }
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
@@ -75,15 +80,45 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         }
     }
     private void initialize(Integer deckId, GameMode gameMode) {
-        List<Card> cards = cardService.findByDeckId(deckId);
-        decksize = cards.size();
-        for (Card card : cards) {
-            if (gameMode == GameMode.SENTENCES) {
-                tasks.add(new Task(card, aiService.createSentence(card)));
-            } else {
-                tasks.add(new Task(card, gameMode));
+        if (gameMode == GameMode.JAM) {
+            Integer currentUserId = securityService.getAuthenticatedUser()
+                    .map(userDetails -> {
+                        User user = userService.findByUsername(userDetails.getUsername());
+                        return user != null ? user.getId() : null;
+                    })
+                    .orElse(null);
+
+            List<Card> cards = cardService.getJam(currentUserId, deckId);
+            decksize = cards.size();
+            for (Card card : cards) {
+                String currentPeriod = userProgressService.findByUserIdAndCardId(currentUserId, card.getId()).getPeriod();
+                GameMode currentGameMode = switch (currentPeriod) {
+                    case "created", "learning" -> GameMode.REVISION;
+                    case "first" -> GameMode.DEFINITIONS;
+                    case "second" -> GameMode.SENTENCES;
+                    case "third" -> GameMode.SENTENCECREATOR;
+                    default -> throw new IllegalStateException("Unexpected value: " + currentPeriod);
+                };
+                if (currentGameMode == GameMode.SENTENCES) {
+                    tasks.add(new Task(card, aiService.createSentence(card)));
+                } else {
+                    tasks.add(new Task(card, currentGameMode));
+                }
+            }
+        } else{
+            List<Card> cards = cardService.findByDeckId(deckId);
+            decksize = cards.size();
+            for (Card card : cards) {
+                if (gameMode == GameMode.SENTENCES) {
+                    tasks.add(new Task(card, aiService.createSentence(card)));
+                } else {
+                    tasks.add(new Task(card, gameMode));
+                }
             }
         }
+
+
+
         currentTaskIndex = 0;
         currentTask = tasks.poll();
         gameCard.addClickListener(clickevent -> {
@@ -123,7 +158,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
 
         cardService.markLearning(currentTask.getCard(), securityService.getAuthenticatedUser()
                 .map(userDetails -> {
-                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    User user = userService.findByUsername(userDetails.getUsername());
                     return user != null ? user.getId() : null;
                 })
                 .orElse(null));
@@ -147,7 +182,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         }
         cardService.markGuessed(currentTask.getGameMode(), currentTask.getCard(), securityService.getAuthenticatedUser()
                 .map(userDetails -> {
-                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    User user = userService.findByUsername(userDetails.getUsername());
                     return user != null ? user.getId() : null;
                 })
                 .orElse(null));

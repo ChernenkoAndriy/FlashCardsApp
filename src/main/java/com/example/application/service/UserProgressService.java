@@ -16,6 +16,10 @@ public class UserProgressService {
         this.userProgressRepository = userProgressRepository;
     }
 
+    public UserProgress findByUserIdAndCardId(Integer userId, Integer cardId) {
+        return userProgressRepository.findByUserIdAndCardId(userId, cardId);
+    }
+
     public List<UserProgress> findAll() {
         return userProgressRepository.findAll();
     }

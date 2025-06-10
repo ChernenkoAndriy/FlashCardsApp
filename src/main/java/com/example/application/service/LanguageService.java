@@ -24,6 +24,10 @@ public class LanguageService {
         return languageRepository.findLanguagesByUserId(userId);
     }
 
+    public Language findLanguageByName(@Param("name") String name){
+        return languageRepository.findLanguageByName(name);
+    }
+
     public void save(Language language) {
         languageRepository.save(language);
     }

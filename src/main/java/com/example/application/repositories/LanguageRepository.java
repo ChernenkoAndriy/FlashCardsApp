@@ -19,4 +19,6 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
     WHERE ud.userId = :userId
     """)
     List<Language> findLanguagesByUserId(@Param("userId") Integer userId);
+
+    Language findLanguageByName(String languageName);
 }
