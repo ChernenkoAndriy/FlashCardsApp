@@ -59,33 +59,34 @@ public class CardTable extends Grid<CardDto> {
 
         addColumn(LitRenderer.<CardDto>of(
                         """
-                        <div style="position: relative; width: 40px; height: 40px;">
-                          <svg viewBox="0 0 36 36" style="transform: rotate(-90deg);">
-                            <path
-                              d="M18 2.0845
-                                 a 15.9155 15.9155 0 0 1 0 31.831
-                                 a 15.9155 15.9155 0 0 1 0 -31.831"
-                              fill="none"
-                              stroke="#eee"
-                              stroke-width="3.8"/>
-                            <path
-                              d="M18 2.0845
-                                 a 15.9155 15.9155 0 0 1 0 31.831
-                                 a 15.9155 15.9155 0 0 1 0 -31.831"
-                              fill="none"
-                              stroke="${item.color}"
-                              stroke-width="3.8"
-                              stroke-dasharray="${item.percent}, 100"
-                              stroke-linecap="round"/>
-                          </svg>
-                        </div>
+                                <div style="position: relative; width: 30px; height: 30px;">
+                                        <svg viewBox="0 0 36 36" width="30" height="30" style="transform: rotate(-90deg);">
+                                          <path
+                                            d="M18 3
+                                               a 15 15 0 0 1 0 30
+                                               a 15 15 0 0 1 0 -30"
+                                            fill="none"
+                                            stroke="#eee"
+                                            stroke-width="6"
+                                          />
+                                          <path
+                                            d="M18 3
+                                               a 15 15 0 0 1 0 30
+                                               a 15 15 0 0 1 0 -30"
+                                            fill="none"
+                                            stroke="${item.color}"
+                                            stroke-width="6"
+                                            stroke-dasharray="${item.percent}, 100"
+                                          />
+                                        </svg>
+                                      </div>
                         """)
                 .withProperty("percent", card -> switch (card.getPeriod()) {
                     case "created" -> 0;
-                    case "learning" -> 25;
-                    case "first" -> 50;
-                    case "second" -> 75;
-                    case "third" -> card.getIsLearned() ? 100 : 90;
+                    case "learning" -> 20;
+                    case "first" -> 40;
+                    case "second" -> 60;
+                    case "third" -> card.getIsLearned() ? 100 : 80;
                     default -> 100;
                 })
                 .withProperty("color", card -> switch (card.getPeriod()) {
