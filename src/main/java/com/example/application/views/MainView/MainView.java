@@ -175,7 +175,7 @@ public class MainView extends VerticalLayout {
             listLayout.setWidthFull();
 
             for (DeckDto deckDto : languageDecks) {
-                DequeRow row = new DequeRow(deckDto, this::deleteDeck, this::editDeck, this::playDeck);
+                DequeRow row = new DequeRow(deckDto, this::deleteDeck, this::editDeck, this::playDeck, this::archiveDeck);
                 listLayout.add(row);
             }
 
@@ -203,6 +203,13 @@ public class MainView extends VerticalLayout {
         updateDecksData();
         configureDeckLists();
         // }
+    }
+
+    void archiveDeck(DeckDto deckDto){
+        // Logic to set the deck as inactive
+        deckService.setDeckActiveStatus(deckDto.getId(), false); // Assuming you add this method to DeckService
+        updateDecksData();
+        configureDeckLists();
     }
 
     void editDeck(DeckDto deckDto) {

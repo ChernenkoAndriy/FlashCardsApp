@@ -28,6 +28,11 @@ public class DeckService {
         this.userDeckRepository = userDeckRepository;
     }
 
+    public void setDeckActiveStatus(Integer deckId, boolean isActive) {
+        deckRepository.updateUserDeckActiveStatus(deckId, isActive);
+    }
+
+
     public List<Deck> findAll() {
         return deckRepository.findAll();
     }
