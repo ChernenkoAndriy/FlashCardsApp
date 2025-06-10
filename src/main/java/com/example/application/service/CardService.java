@@ -97,7 +97,7 @@ public class CardService {
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(1), "first");
                 } else if (gameMode.equals(GameMode.DEFINITIONS)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(3), "second");
-                } else if (gameMode.equals(GameMode.SENTENCES)){
+                } else if (gameMode.equals(GameMode.SENTENCECREATOR)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
                 } /*else if (gameMode.equals(GameMode.USAGE)){
                     userProgressRepository.setLearned(card.getId(), userId);
@@ -107,7 +107,7 @@ public class CardService {
             case "first":{
                 if (gameMode.equals(GameMode.DEFINITIONS)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(3), "second");
-                } else if (gameMode.equals(GameMode.SENTENCES)){
+                } else if (gameMode.equals(GameMode.SENTENCECREATOR)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
                 } /*else if (gameMode.equals(GameMode.USAGE)){
                     userProgressRepository.setLearned(card.getId(), userId);
@@ -115,7 +115,7 @@ public class CardService {
                 break;
             }
             case "second":{
-                if (gameMode.equals(GameMode.SENTENCES)){
+                if (gameMode.equals(GameMode.SENTENCECREATOR)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(7), "third");
                 } /*else if (gameMode.equals(GameMode.USAGE)){
                     userProgressRepository.setLearned(card.getId(), userId);

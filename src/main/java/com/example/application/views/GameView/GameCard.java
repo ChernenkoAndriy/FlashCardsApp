@@ -159,7 +159,7 @@ public class GameCard extends VerticalLayout {
         } else if (mode == GameMode.DEFINITIONS) {
             frontText.setText(card.getDefinition());
             setFlippable(true);
-        } else if (mode == GameMode.SENTENCES) {
+        } else if (mode == GameMode.SENTENCECREATOR) {
             frontText.setText(card.getWord());
             if(flipped){
                 flipCard();
@@ -186,7 +186,6 @@ public class GameCard extends VerticalLayout {
         setupTextDiv(backWord);
         backLayout.add(backWord);
     }
-
     private void setupTextDiv(Div textDiv) {
         textDiv.getStyle()
                 .set("color", "white")
@@ -225,7 +224,6 @@ public class GameCard extends VerticalLayout {
                         "window.addEventListener('resize', adjustFontSize);"
         );
     }
-
     private void setStyle() {
         getStyle().set("perspective", "1000px");
 
@@ -264,4 +262,34 @@ public class GameCard extends VerticalLayout {
                 .set("color", "white")
                 .set("transform", "rotateY(180deg)");
     }
-   }
+    public void setTask(Task task, String sentence) {
+        Card card = task.getCard();
+        mainLayout.removeAll();
+        backLayout.removeAll();
+        mainLayout.setAlignItems(Alignment.CENTER);
+        backLayout.setAlignItems(Alignment.CENTER);
+
+        Div frontText = new Div();
+            frontText.setText(sentence);
+            setFlippable(true);
+        setupTextDiv(frontText);
+        mainLayout.add(frontText);
+
+        if (card.getImage() != null && !card.getImage().isEmpty()) {
+            Image image = new Image(card.getImage(), "Card Image");
+            image.setMaxHeight("60%");
+            image.setMaxWidth("100%");
+            image.getStyle()
+                    .set("object-fit", "contain")
+                    .set("margin-bottom", "10px")
+                    .set("flex-shrink", "0");
+            image.getElement().addEventListener("error", e -> image.setVisible(false));
+            backLayout.add(image);
+        }
+
+        Div backWord = new Div();
+        backWord.setText(card.getWord());
+        setupTextDiv(backWord);
+        backLayout.add(backWord);
+    }
+}

@@ -4,7 +4,6 @@ import com.example.application.data.Card;
 import com.example.application.service.AIService;
 import com.example.application.service.CardService;
 import com.example.application.views.Components.MainLayout;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -12,11 +11,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 @RolesAllowed({"ADMIN", "USER"})
 @Route(value = "game", layout = MainLayout.class)
@@ -35,8 +32,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private AIService aiService;
     private ButtonLayout currentButtonLayout;
     private SentenceLayout currentSentenceLayout;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
     @Autowired
     public GameView(CardService service, AIService aiService) {
         cardService = service;
@@ -78,24 +73,29 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         List<Card> cards = cardService.findByDeckId(deckId);
         decksize = cards.size();
         for (Card card : cards) {
-            tasks.add(new Task(card, gameMode));
+            if (gameMode == GameMode.SENTENCES) {
+                tasks.add(new Task(card, aiService.createSentence(card)));
+            } else {
+                tasks.add(new Task(card, gameMode));
+            }
         }
         currentTaskIndex = 0;
         currentTask = tasks.poll();
-
         gameCard.addClickListener(clickevent -> {
-
             gameCard.flipCard();
             handleCardFlip();
         });
-
         setTask(currentTask);
         gameCard.appearNormal();
     }
 
     private void setTask(Task task) {
-        gameCard.setTask(task);
-        if (task.getGameMode() == GameMode.SENTENCES) {
+        if(task.getGameMode()==GameMode.SENTENCES){
+            gameCard.setTask(task, task.getSentence());
+        }else {
+            gameCard.setTask(task);
+        }
+        if (task.getGameMode() == GameMode.SENTENCECREATOR) {
             addSentenceLayout(task);
         } else {
             addButtonLayout();
@@ -114,9 +114,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             taskFail();
         }
     }
-
-    // У GameView.java змініть ці методи:
-
     private void taskFail() {
         bottom.removeAll();
         gameCard.flipCard();
@@ -136,7 +133,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             gameFinished();
         }
     }
-
     private void taskSuccess() {
         bottom.removeAll();
         gameCard.flipCard();
@@ -156,7 +152,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             gameFinished();
         }
     }
-
     private void gameFinished() {
         GameFinishScreen finishedScreen = new GameFinishScreen(
                 score,
@@ -169,7 +164,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         removeAll();
         add(finishedScreen);
     }
-
     private void setStyle() {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -188,9 +182,8 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         bottom.setHeight("15%");
         add(bottom);
     }
-
     private void handleCardFlip() {
-        if (currentTask.getGameMode() == GameMode.SENTENCES) {
+        if (currentTask.getGameMode() == GameMode.SENTENCECREATOR) {
 
         } else {
             if (currentButtonLayout != null) {
@@ -198,7 +191,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             }
         }
     }
-
     private void addButtonLayout() {
         bottom.removeAll();
         bottom.setVisible(false);
@@ -208,7 +200,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         bottom.setVisible(true);
         bottom.add(currentButtonLayout);
     }
-
     private void addSentenceLayout(Task task) {
         bottom.removeAll();
         bottom.setVisible(false);
@@ -220,6 +211,4 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         bottom.add(currentSentenceLayout);
         bottom.setVisible(true);
     }
-
-
 }

@@ -10,7 +10,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 //отут як і в редагуванні треба якось передати id як конфігурацію на наступну сторінку
 //але я хз як це зробити тож поки не чіпай, рівно як і кнопку edit
@@ -32,35 +31,42 @@ public class PlayButton extends MiniButton {
             buttonsLayout.setWidth("100%");
             buttonsLayout.setHeight("100%");
 
-            Button revision = new Button("Revision", e -> {
+            Button revision = new Button("Revisions", e -> {
                 onPlay.accept(deckDto, GameMode.REVISION);
                 dialog.close();
             });
 
-            Button definition = new Button("Definition", e -> {
+            Button definition = new Button("Definitions", e -> {
                 onPlay.accept(deckDto, GameMode.DEFINITIONS);
                 dialog.close();
             });
-
-            Button advanced = new Button("Advanced", e -> {
+            Button sentence = new Button("Sentences", e -> {
                 onPlay.accept(deckDto, GameMode.SENTENCES);
+                dialog.close();
+            });
+            Button sentenceCreator = new Button("Sentence Creator", e -> {
+                onPlay.accept(deckDto, GameMode.SENTENCECREATOR);
                 dialog.close();
             });
             revision.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             definition.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            advanced.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            sentence.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            sentenceCreator.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
 
             revision.setWidthFull();
             definition.setWidthFull();
-            advanced.setWidthFull();
+            sentence.setWidthFull();
+            sentenceCreator.setWidthFull();
 
-            // Задаємо вдвічі більший шрифт
             revision.getStyle().set("font-size", "2em");
             definition.getStyle().set("font-size", "2em");
-            advanced.getStyle().set("font-size", "2em");
+            sentence.getStyle().set("font-size", "2em");
+            sentenceCreator.getStyle().set("font-size", "2em");
 
-            buttonsLayout.add(revision, definition, advanced);
-            buttonsLayout.expand(revision, definition, advanced);
+
+            buttonsLayout.add(revision, definition, sentence, sentenceCreator);
+            buttonsLayout.expand(revision, definition, sentence, sentenceCreator);
 
             dialog.add(buttonsLayout);
             dialog.setWidth("500px");
