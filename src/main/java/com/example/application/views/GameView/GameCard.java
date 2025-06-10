@@ -169,15 +169,19 @@ public class GameCard extends VerticalLayout {
         setupTextDiv(frontText);
         mainLayout.add(frontText);
 
-        if (card.getImage() != null && !card.getImage().isEmpty()) {
-            Image image = new Image(card.getImage(), "Card Image");
+        if (card.getImage() != null) {
+            Image image = new Image(
+                    "data:" + card.getImageType() + ";base64," +
+                            java.util.Base64.getEncoder().encodeToString(card.getImage()),
+                    "Card Image"
+            );
             image.setMaxHeight("60%");
             image.setMaxWidth("100%");
             image.getStyle()
                     .set("object-fit", "contain")
                     .set("margin-bottom", "10px")
-                    .set("flex-shrink", "0");
-            image.getElement().addEventListener("error", e -> image.setVisible(false));
+                    .set("flex-shrink", "0")
+                    .set("border-radius", "8px");
             backLayout.add(image);
         }
 
@@ -275,15 +279,19 @@ public class GameCard extends VerticalLayout {
         setupTextDiv(frontText);
         mainLayout.add(frontText);
 
-        if (card.getImage() != null && !card.getImage().isEmpty()) {
-            Image image = new Image(card.getImage(), "Card Image");
+        if (card.getImage() != null) {
+            Image image = new Image(
+                    "data:" + card.getImageType() + ";base64," +
+                            java.util.Base64.getEncoder().encodeToString(card.getImage()),
+                    "Card Image"
+            );
             image.setMaxHeight("60%");
             image.setMaxWidth("100%");
             image.getStyle()
                     .set("object-fit", "contain")
                     .set("margin-bottom", "10px")
-                    .set("flex-shrink", "0");
-            image.getElement().addEventListener("error", e -> image.setVisible(false));
+                    .set("flex-shrink", "0")
+                    .set("border-radius", "8px");
             backLayout.add(image);
         }
 

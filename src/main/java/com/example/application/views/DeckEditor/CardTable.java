@@ -5,10 +5,13 @@ import com.example.application.dto.CardDto;
 import com.example.application.service.CardService;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
+import com.vaadin.flow.server.StreamResource;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 public class CardTable extends Grid<CardDto> {
@@ -28,6 +31,20 @@ public class CardTable extends Grid<CardDto> {
                 .setHeader("Word")
                 .setWidth("20%")
                 .setSortable(true);
+
+        addColumn(new ComponentRenderer<>(card -> {
+            if (card.getImage() != null && card.getImage().length > 0) {
+                Image image = new Image();
+                StreamResource resource = new StreamResource("image",
+                        () -> new ByteArrayInputStream(card.getImage()));
+                image.setSrc(resource);
+                image.setWidth("40px");
+                image.setHeight("40px");
+                return image;
+            } else {
+                return new Span("No image");
+            }
+        })).setHeader("Image").setAutoWidth(true);
 
         addColumn(CardDto::getTranslate)
                 .setHeader("Translate")

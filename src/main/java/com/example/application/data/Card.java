@@ -20,13 +20,15 @@ public class Card {
     @Column(name = "`definition`", nullable = false)
     private String definition;
     @Lob
-    @Column(name = "`image`", nullable = true)
-    private String image;
+    @Column(name = "`image`", columnDefinition = "LONGBLOB")
+    private byte[] image;
 
+    @Column(name = "`image_content_type`", nullable = true)
+    private String imageType;
     @Column(name = "`deck_id`", nullable = false)
     private Integer deckId;
 
-    public Card(String word, String translate, String definition, String image, Integer deckId) {
+    public Card(String word, String translate, String definition, byte[] image, Integer deckId) {
         this.word = word;
         this.translate = translate;
         this.definition = definition;
@@ -70,12 +72,19 @@ public class Card {
         this.definition = definition;
     }
 
-    public String getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(byte[] image) {
         this.image = image;
+    }
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imagType) {
+        this.imageType = imageType;
     }
 
     public Integer getDeckId() {

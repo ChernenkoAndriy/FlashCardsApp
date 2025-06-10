@@ -5,12 +5,12 @@ public class CardDto {
     private String word;
     private String translate;
     private String definition;
-    private String image;
-    private String period;
+    private byte[] image;
+    private String imageContentType;    private String period;
     private boolean isLearned;
 
     // Конструктор
-    public CardDto(Integer id, String word, String translate, String definition, String image, String period, boolean isLearned) {
+    public CardDto(Integer id, String word, String translate, String definition, byte[] image, String period, boolean isLearned) {
         this.id = id;
         this.word = word;
         this.translate = translate;
@@ -39,9 +39,9 @@ public class CardDto {
         return definition;
     }
 
-    public String getImage() {
+public byte[] getImage(){
         return image;
-    }
+}
 
     public String getPeriod() {
         return period;
