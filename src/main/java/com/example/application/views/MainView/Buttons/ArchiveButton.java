@@ -12,7 +12,7 @@ public class ArchiveButton extends MiniButton {
         super();
         setIcon(VaadinIcon.ARCHIVE.create());
         getStyle().set("color", "white");
-        getStyle().set("background-color", "var(--lumo-contrast-35pct)");
+        getStyle().set("background-color", "var(--lumo-contrast-30pct)");
 
         getElement().setAttribute("title", "Archive");
         addClickListener(event -> onArchive.accept(deckDto));

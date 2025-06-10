@@ -52,6 +52,9 @@ public class DeckService {
         return deckRepository.findActiveDeckDtosByUserAndLanguage(userId, languageId);
     }
 
+    public List<DeckDto> findArchivedDeckDtosByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId) {
+        return deckRepository.findArchivedDeckDtosByUserAndLanguage(userId, languageId);
+    }
 
     public void save(Deck deck) {
         deckRepository.save(deck);
@@ -70,6 +73,8 @@ public class DeckService {
     public void deleteByID(Integer id) {
         deckRepository.deleteById(id);
     }
+
+
 
     public Optional<Deck> findById(Integer deckId) {
         return deckRepository.findById(deckId);
