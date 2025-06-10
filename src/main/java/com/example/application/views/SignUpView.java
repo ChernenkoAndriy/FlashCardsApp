@@ -19,7 +19,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 
-import java.sql.SQLIntegrityConstraintViolationException;
+
 import java.util.List;
 
 @Route("signup")

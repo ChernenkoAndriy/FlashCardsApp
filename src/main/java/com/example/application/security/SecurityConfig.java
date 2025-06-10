@@ -27,10 +27,14 @@ public class SecurityConfig extends VaadinWebSecurity {
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth ->
                 auth.requestMatchers(
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/resetpassword"),
+                        AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/resetpassword/**"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/images/*.png"),
                         AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/icons/*.png"),
-                        AntPathRequestMatcher.antMatcher("/public/**")
+                        AntPathRequestMatcher.antMatcher("/public/**"),
+                        AntPathRequestMatcher.antMatcher("/api/password-reset/**")
                 ).permitAll());
+
 
         super.configure(http);
         setLoginView(http, LoginView.class);

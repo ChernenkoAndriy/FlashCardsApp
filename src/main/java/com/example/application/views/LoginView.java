@@ -13,7 +13,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 	private final LoginForm loginForm = new LoginForm();
 	private Image logoImage;
 	private RouterLink signUpLink;
-	private RouterLink forgotPasswordLink;
+	private RouterLink passwordRecoveryLink;
 
 	public LoginView() {
 		configureComponents();
@@ -25,7 +25,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 		loginForm.setForgotPasswordButtonVisible(false);
 		logoImage = new Image("icons/Icon.png", "Sleeve icon");
 		signUpLink = new RouterLink("Create an account", SignUpView.class);
-	//	forgotPasswordLink = new RouterLink("Forgot password?", MainView.class);
+		passwordRecoveryLink = new RouterLink("Forgot password?", PasswordRecoveryView.class);
 	}
 	private void createLayout() {
 		addClassName("login-view");
@@ -35,7 +35,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 		logoImage.setHeight("100px");
 		add(logoImage, loginForm);
 		add(signUpLink) ;
-		//add(forgotPasswordLink);
+		add(passwordRecoveryLink);
 	}
 
 	@Override

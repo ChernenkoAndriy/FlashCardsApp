@@ -8,19 +8,24 @@ import org.springframework.stereotype.Service;
 public class AIService {
 
     private final ChatClient.Builder chatClientBuilder;
+    private final CardService cardService;
 
-    public AIService(ChatClient.Builder chatClientBuilder) {
+    public AIService(ChatClient.Builder chatClientBuilder, CardService cardService) {
         this.chatClientBuilder = chatClientBuilder;
+        this.cardService = cardService;
     }
 
     public String checkSentenceWithCardWord(Card card, String userSentence) {
         var client = chatClientBuilder.build();
+        String language = cardService.getLanguageByCard(card);
+        System.out.println("Checking sentence for card: " + card.getWord() + " in language: " + language + ", user sentence: " + userSentence);
 
-        String aiPrompt = "Act as a highly accurate English grammar and spelling checker. " +
+        String aiPrompt = "Act as a highly accurate " + language + " grammar and spelling checker. " +
                 "Analyze if the following sentence correctly uses the word '" + card.getWord() + "'. " +
                 "Check for grammatical errors, spelling mistakes, or incorrect usage of the word. " +
-                "If the sentence is correct, say 'The sentence is correct.' " +
-                "If there are errors, provide the corrected sentence and a brief explanation " +
+                "Crucially, verify that the sentence *actually contains* the word '" + card.getWord() + "' (or a correctly inflected form of it). " +
+                "If the sentence is correct and successfully incorporates the word '" + card.getWord() + "', say 'The sentence is correct.' " +
+                "If there are errors, or if the sentence *does not contain* the word '" + card.getWord() + "' (or its correct form), provide the corrected sentence and a brief explanation " +
                 "of the changes. Focus particularly on the usage of the word '" + card.getWord() + "'. " +
                 "Sentence to check: \"" + userSentence + "\"";
 
@@ -31,8 +36,9 @@ public class AIService {
 
     public String createSentence(Card card) {
         var client = chatClientBuilder.build();
+        String language = cardService.getLanguageByCard(card); // Отримуємо мову через картку
 
-        String aiPrompt = "You are a highly accurate English grammar and vocabulary teacher. " +
+        String aiPrompt = "You are a highly accurate " + language + " grammar and vocabulary teacher. " +
                 "Your task is to create *one single sentence* that serves as a vocabulary test question. " +
                 "This sentence must use a form of the word '" + card.getWord() + "' in a way that its meaning " +
                 "directly corresponds to '" + card.getDefinition() + "'. " +
@@ -43,7 +49,7 @@ public class AIService {
                 "Do NOT use the word '" + card.getWord() + "' anywhere else in the sentence, only replaced by '...'. " +
                 "Example for 'apple' meaning 'fruit': 'She carefully bit into the crisp, red ... [fruit].' " +
                 "Example for 'treasure' meaning 'very valuable thing': 'Stories about pirates often include a search for buried ... [very valuable thing].' " +
-                "Now, create a sentence for the word '" + card.getWord() + "' meaning '" + card.getDefinition() + "':";
+                "Now, create a sentence for the " + language + " word '" + card.getWord() + "' meaning '" + card.getDefinition() + "':";
 
         return client.prompt(aiPrompt)
                 .call()
@@ -52,16 +58,17 @@ public class AIService {
 
     public String checkUserWordChoice(Card originalCard, String aiGeneratedSentence, String userAttempt) {
         var client = chatClientBuilder.build();
+        String language = cardService.getLanguageByCard(originalCard);
         String sentenceWithUserAttempt = aiGeneratedSentence.replace("... [" + originalCard.getDefinition() + "]", userAttempt);
 
-        String aiPrompt = "You are an English language expert and a fair evaluator. " +
+        String aiPrompt = "You are an " + language + " language expert and a fair evaluator. " +
                 "A student was given the following sentence with a blank: " +
                 "\"" + aiGeneratedSentence + "\"\n" +
                 "The student attempted to fill the blank with the word: \"" + userAttempt + "\".\n" +
                 "The original, correct word for this blank was: \"" + originalCard.getWord() + "\".\n\n" +
                 "Evaluate the student's attempt. Consider the following:\n" +
-                "1. Is \"" + userAttempt + "\" the same word (or a grammatically correct form) as the original word \"" + originalCard.getWord() + "\"?\n" +
-                "2. Is the sentence with the student's word (" + sentenceWithUserAttempt + ") grammatically correct?\n" +
+                "1. Is \"" + userAttempt + "\" the same word (or a grammatically correct form) as the original " + language + " word \"" + originalCard.getWord() + "\"?\n" +
+                "2. Is the sentence with the student's word (" + sentenceWithUserAttempt + ") grammatically correct in " + language + "?\n" +
                 "3. Does \"" + userAttempt + "\" fit the meaning implied by the original definition ('" + originalCard.getDefinition() + "') in the sentence context?\n\n" +
                 "Respond in one of the following ways:\n" +
                 "- If the user's word is exactly the original word (or a correctly inflected form) and the sentence is grammatically perfect with it: " +
