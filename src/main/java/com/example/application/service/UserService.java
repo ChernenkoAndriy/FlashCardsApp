@@ -2,6 +2,7 @@ package com.example.application.service;
 
 import com.example.application.data.User;
 import com.example.application.repositories.UserRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,4 +56,11 @@ public class UserService {
     public User findByUsername(String username) {
        return userRepository.findByUsername(username);
     }
+
+    public void setWorkload(int id, int workload) {
+        userRepository.updateUserWorkload(id, workload);
+    }
+    public Integer findUserWorkloadById(int userId){
+        return userRepository.findUserWorkloadById(userId);
+    };
 }
