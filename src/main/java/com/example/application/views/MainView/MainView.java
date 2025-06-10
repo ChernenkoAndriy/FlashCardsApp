@@ -50,6 +50,7 @@ public class MainView extends VerticalLayout {
     private final CardService cardService;
     private final UserService userService;
     private final SecurityService securityService;
+    private final Button workloadButton = new Button("Daily Workload");
     private ComboBox<String> archivedSwitch = new ComboBox<>("Active switch");
 
     public MainView(DeckService deckService, LanguageService languageService,
@@ -86,7 +87,7 @@ public class MainView extends VerticalLayout {
         createDeckButton.getStyle().set("font-size", "1.2rem");
         createDeckButton.addThemeName("primary");
         createDeckButton.setWidth("auto");
-        createDeckButton.setHeight("100%");
+        createDeckButton.setHeight("50%");
         createDeckButton.getStyle().set("margin", "0");
         decksAccordion.setWidth("90%");
     }
@@ -101,29 +102,46 @@ public class MainView extends VerticalLayout {
     }
     private HorizontalLayout createHeaderLayout() {
         HorizontalLayout headerLayout = new HorizontalLayout(allDecksTitle);
+        headerLayout.addToEnd(workloadButton);
+        workloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        workloadButton.addClickListener(e -> {
+            int initialValue = userService.findUserWorkloadById(getCurrentUserId());
+            WorkLoadDialog dialog = new WorkLoadDialog(this::updateWorkLoad, initialValue);
+        });
         headerLayout.setAlignItems(Alignment.BASELINE);
         headerLayout.setWidth("90%");
         return headerLayout;
     }
     private HorizontalLayout createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout(createDeckButton);
-        buttonLayout.setWidthFull();
         buttonLayout.addToEnd(archivedSwitch);
+        buttonLayout.setWidthFull();
         archivedSwitch.setItems("Active", "Archived");
-        buttonLayout.setAlignItems(Alignment.START);
         archivedSwitch.setAllowCustomValue(false);
         archivedSwitch.setValue("Active");
+        archivedSwitch.setHeight("70%");
         archivedSwitch.addValueChangeListener(e -> {
-        updateDecksData(archivedSwitch.getValue());
-        configureDeckLists(archivedSwitch.getValue());});
+            updateDecksData(archivedSwitch.getValue());
+            configureDeckLists(archivedSwitch.getValue());
+        });
+
+        // Вирівнювання по базовій лінії
+        buttonLayout.setAlignItems(Alignment.BASELINE);
+        buttonLayout.setVerticalComponentAlignment(Alignment.BASELINE, createDeckButton);
+        buttonLayout.setVerticalComponentAlignment(Alignment.BASELINE, archivedSwitch);
+
+        // Стилі
         buttonLayout.getStyle()
                 .set("width", "90%")
-                .set("margin-left", "4rem");
+                .set("margin-left", "4rem")
+                .set("margin", "1rem 0");
+
         buttonLayout.setPadding(false);
         buttonLayout.setMargin(false);
-        buttonLayout.getStyle().set("margin", "1rem 0");
+
         return buttonLayout;
     }
+
     private Integer getCurrentUserId() {
         return securityService.getAuthenticatedUser()
                 .map(userDetails -> {
@@ -297,5 +315,8 @@ public class MainView extends VerticalLayout {
         dialog.setWidth("500px");
         dialog.setHeight("350px");
         dialog.open();
+    }
+    public void updateWorkLoad(int workload) {
+        userService.setWorkload(getCurrentUserId(), workload);
     }
 }
