@@ -115,7 +115,7 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
 
     @Query("""
-                SELECT DISTINCT new com.example.application.dto.CardDto(c.id, c.word, c.translate, c.definition, c.image, p.period)
+                SELECT DISTINCT new com.example.application.dto.CardDto(c.id, c.word, c.translate, c.definition, c.image, p.period, p.isLearned)
                 FROM Card c
                 JOIN UserProgress p ON p.cardId = c.id
                 WHERE p.userId = :userId AND c.deckId = :deckId

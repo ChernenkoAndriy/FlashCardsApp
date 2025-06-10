@@ -7,15 +7,17 @@ public class CardDto {
     private String definition;
     private String image;
     private String period;
+    private boolean isLearned;
 
     // Конструктор
-    public CardDto(Integer id, String word, String translate, String definition, String image, String period) {
+    public CardDto(Integer id, String word, String translate, String definition, String image, String period, boolean isLearned) {
         this.id = id;
         this.word = word;
         this.translate = translate;
         this.definition = definition;
         this.image = image;
         this.period = period;
+        this.isLearned = isLearned;
     }
 
     public CardDto() {
@@ -44,6 +46,10 @@ public class CardDto {
     public String getPeriod() {
         return period;
     }
+    public boolean getIsLearned() {
+        return isLearned;
+    }
+
 
 
 }
