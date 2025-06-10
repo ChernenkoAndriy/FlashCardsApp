@@ -224,7 +224,6 @@ public class MainView extends VerticalLayout {
         // }
     }
 
-    void archiveDeck(DeckDto deckDto) {
     void setActivness(DeckDto deckDto, boolean activeness){
         // Logic to set the deck as inactive
         deckService.setDeckActiveStatus(deckDto.getId(), activeness);
