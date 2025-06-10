@@ -48,6 +48,8 @@ public interface UserProgressRepository extends JpaRepository<UserProgress, Inte
             WHERE up.cardId = :cardId AND up.userId = :userId
             """)
     void setLearned(Integer cardId, Integer userId);
+
+
 @Query("""
         SELECT 1
         FROM UserProgress up

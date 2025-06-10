@@ -35,9 +35,22 @@ public interface DeckRepository extends JpaRepository<Deck, Integer> {
   List<DeckDto> findActiveDeckDtosByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId);
 
 
+  @Query("""
+              SELECT DISTINCT new com.example.application.dto.DeckDto(d.id, d.name, d.cardsNumber, l.name, ud.progress, ud.learnedNumber)
+              FROM Deck d
+              JOIN Language l ON l.id = d.languageId
+              JOIN UserDeck ud ON d.id = ud.deckId
+              WHERE ud.userId = :userId AND ud.isActive = false
+          """)
+  List<DeckDto> findAllNotActiveDeckDtosByUser(@Param("userId") Integer userId);
+
+
   @Modifying
   @Transactional
   @Query(value = "UPDATE user_deck SET is_active = :isActive WHERE deck_id = :deckId", nativeQuery = true)
   void updateUserDeckActiveStatus(@Param("deckId") Integer deckId, @Param("isActive") boolean isActive);
+
+
+  Deck findDeckById(Integer deckId);
 
 }

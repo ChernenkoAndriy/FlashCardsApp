@@ -52,6 +52,10 @@ public class DeckService {
         return deckRepository.findActiveDeckDtosByUserAndLanguage(userId, languageId);
     }
 
+    public List<DeckDto> findNotActiveDeckDtosByUserAndLanguage(@Param("userId") Integer userId, @Param("languageId") Integer languageId) {
+        return deckRepository.findAllNotActiveDeckDtosByUser(userId);
+    }
+
 
     public void save(Deck deck) {
         deckRepository.save(deck);

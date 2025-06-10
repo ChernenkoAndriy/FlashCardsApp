@@ -73,6 +73,15 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
             """)
     void decrementLearnedNumberForUsersWithLearnedCard(@Param("cardId") Integer cardId);
 
+    @Modifying
+    @Transactional
+    @Query("""
+                UPDATE UserDeck ud
+                SET ud.learnedNumber = ud.learnedNumber + 1
+                WHERE ud.userId =:userId AND ud.deckId =:deckId
+            """)
+    void incrementLearnedNumberUser(@Param("deckId") Integer deckId, @Param("userId") Integer userId);
+
     @Query("""
             SELECT c
             FROM Card c
