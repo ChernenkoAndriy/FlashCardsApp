@@ -50,6 +50,7 @@ public class DequeRow extends HorizontalLayout {
         deleteButton = new DeleteButton(deckDto, onDelete);
         editButton   = new EditButton(deckDto, onEdit);
         playButton   = new PlayButton(deckDto, onPlay);
+        playButton.setEnabled(deckDto.getCardsNumber()!=0);
         archiveButton = new ArchiveButton(deckDto, onArchive, isActive);
 
         dequeCard.setWidth("60%");

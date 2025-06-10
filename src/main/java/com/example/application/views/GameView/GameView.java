@@ -40,7 +40,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private SentenceLayout currentSentenceLayout;
     private final SecurityService securityService;
     private final UserService userService;
-
     @Autowired
     public GameView(CardService service, AIService aiService, SecurityService securityService, UserService userService, UserProgressService userProgressService) {
         cardService = service;
