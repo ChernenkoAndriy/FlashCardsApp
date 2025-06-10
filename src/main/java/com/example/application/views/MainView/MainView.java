@@ -191,21 +191,23 @@ public class MainView extends VerticalLayout {
             List<DeckDto> languageDecks = entry.getValue();
             Integer languageId = languageService.findLanguageByName(language).getId();
 
-            PlayJamButton playJamButton = new PlayJamButton(languageId, cardService, getCurrentUserId(), (langId, gameMode) -> {
-                getUI().ifPresent(ui -> {
-                    String langParam = URLEncoder.encode(langId.toString(), StandardCharsets.UTF_8);
-                    String modeParam = URLEncoder.encode(gameMode.name(), StandardCharsets.UTF_8);
-                    ui.navigate("game?deckId=" + languageId + "&mode=" + gameMode);
-                });
-            });
-
-
             VerticalLayout listLayout = new VerticalLayout();
             listLayout.setPadding(false);
             listLayout.setSpacing(false);
             listLayout.setWidthFull();
 
-            listLayout.add(playJamButton);
+
+            if(value.equals("Active")) {
+                PlayJamButton playJamButton = new PlayJamButton(languageId, cardService, getCurrentUserId(), (langId, gameMode) -> {
+                    getUI().ifPresent(ui -> {
+                        String langParam = URLEncoder.encode(langId.toString(), StandardCharsets.UTF_8);
+                        String modeParam = URLEncoder.encode(gameMode.name(), StandardCharsets.UTF_8);
+                        ui.navigate("game?deckId=" + languageId + "&mode=" + gameMode);
+                    });
+                });
+                listLayout.add(playJamButton);
+            }
+
 
             for (DeckDto deckDto : languageDecks) {
                 DequeRow row;
