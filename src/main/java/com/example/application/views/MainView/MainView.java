@@ -8,6 +8,7 @@ import com.example.application.service.CardService;
 import com.example.application.service.DeckService;
 import com.example.application.service.LanguageService;
 import com.example.application.service.UserService;
+import com.example.application.security.SecurityService;
 import com.example.application.views.Components.MainLayout;
 import com.example.application.views.GameView.GameMode;
 import com.vaadin.flow.component.accordion.Accordion;
@@ -42,30 +43,31 @@ public class MainView extends VerticalLayout {
 
     private Map<String, List<DeckDto>> decksByLanguage = new HashMap<>();
     private final DeckService deckService;
-    private final UserService userService;
     private final LanguageService languageService;
     private final CardService cardService;
+    private final UserService userService;
+    private final SecurityService securityService;
 
-
-    public MainView(DeckService deckService, UserService userService, LanguageService languageService, CardService cardService) {
+    public MainView(DeckService deckService, LanguageService languageService,
+                    CardService cardService, UserService userService, SecurityService securityService) {
         this.deckService = deckService;
-        this.userService = userService;
         this.languageService = languageService;
         this.cardService = cardService;
+        this.userService = userService;
+        this.securityService = securityService;
 
         initialiseComponents();
         configureStyles();
         configureLayouts();
 
-        // Завантаження і показ колод
         updateDecksData();
         configureDeckLists();
 
         add(greeting, createHeaderLayout(), createButtonLayout(), decksAccordion);
 
-        // Прив’язуємо кнопку створення нової колоди
         createDeckButton.addClickListener(e -> createDeck());
     }
+
     private void initialiseComponents() {
         greeting = new H1("Welcome! Let`s learn some words!");
         allDecksTitle = new H2("All Decks");
@@ -73,6 +75,7 @@ public class MainView extends VerticalLayout {
         decksByLanguage = new HashMap<>();
         decksAccordion = new Accordion();
     }
+
     private void configureStyles() {
         greeting.addClassName("banner");
         greeting.getStyle().set("font-size", "300%");
@@ -85,6 +88,7 @@ public class MainView extends VerticalLayout {
         createDeckButton.getStyle().set("margin", "0");
         decksAccordion.setWidth("90%");
     }
+
     private void configureLayouts() {
         setHeight("100%");
         setAlignItems(Alignment.CENTER);
@@ -94,12 +98,14 @@ public class MainView extends VerticalLayout {
         setSpacing(true);
         getStyle().set("padding", "2rem 3rem 0rem 3rem");
     }
+
     private HorizontalLayout createHeaderLayout() {
         HorizontalLayout headerLayout = new HorizontalLayout(allDecksTitle);
         headerLayout.setAlignItems(Alignment.BASELINE);
         headerLayout.setWidth("90%");
         return headerLayout;
     }
+
     private HorizontalLayout createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout(createDeckButton);
         buttonLayout.setWidthFull();
@@ -112,9 +118,31 @@ public class MainView extends VerticalLayout {
         buttonLayout.getStyle().set("margin", "1rem 0");
         return buttonLayout;
     }
+
+    /**
+     * Отримує ID поточного авторизованого користувача
+     */
+    private Integer getCurrentUserId() {
+        return securityService.getAuthenticatedUser()
+                .map(userDetails -> {
+                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    return user != null ? user.getId() : null;
+                })
+                .orElse(null);
+    }
+
     private void updateDecksData() {
         decksByLanguage.clear();
-        Integer userId = 3;
+
+        Integer userId = getCurrentUserId();
+        if (userId == null) {
+            // Якщо користувач не авторизований, показуємо порожній список
+            System.err.println("User not authenticated!");
+            return;
+        }
+
+        // Логування для діагностики (можна видалити в продакшені)
+        System.out.println("Current user ID: " + userId);
 
         for(Card card : cardService.findAllLearnedByUser(userId)){
             System.out.println(card.getWord()+" "+card.getDeckId());
@@ -123,16 +151,17 @@ public class MainView extends VerticalLayout {
         System.out.println(cardService.userHasCardsByLanguage(userId, 2));
         System.out.println(cardService.userHasUnlearnedCardsByLanguage(userId, 2));
 
-
-        for (Card card:cardService.getJam(userId,2)){
+        for (Card card : cardService.getJam(userId, 2)){
             System.out.println(card.getWord()+" "+card.getDeckId()+" "+card.getId());
         }
+
         for (Language language : languageService.findLanguagesByUserId(userId)) {
             List<DeckDto> deckDtos = deckService.findActiveDeckDtosByUserAndLanguage(userId, language.getId());
-            System.out.println("DECKS: "+deckDtos.size());
+            System.out.println("DECKS for language " + language.getName() + ": " + deckDtos.size());
             decksByLanguage.put(language.getName(), deckDtos);
         }
     }
+
     private void configureDeckLists() {
         decksAccordion.getChildren().forEach(component -> decksAccordion.remove(component));
 
@@ -160,9 +189,20 @@ public class MainView extends VerticalLayout {
     }
 
     void deleteDeck(DeckDto deckDto) {
+        // Додаткова перевірка безпеки - чи належить колода поточному користувачу
+        Integer currentUserId = getCurrentUserId();
+        if (currentUserId == null) {
+            System.err.println("Cannot delete deck: user not authenticated");
+            return;
+        }
+
+        // Можна додати перевірку, чи належить колода користувачу
+        // Deck deck = deckService.findById(deckDto.getId());
+        // if (deck != null && deck.getUserId().equals(currentUserId)) {
         deckService.deleteByID(deckDto.getId());
         updateDecksData();
         configureDeckLists();
+        // }
     }
 
     void editDeck(DeckDto deckDto) {
@@ -178,6 +218,12 @@ public class MainView extends VerticalLayout {
     }
 
     void createDeck() {
+        Integer currentUserId = getCurrentUserId();
+        if (currentUserId == null) {
+            System.err.println("Cannot create deck: user not authenticated");
+            return;
+        }
+
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Create New Deck");
 
@@ -202,11 +248,14 @@ public class MainView extends VerticalLayout {
                 Deck newDeck = new Deck();
                 newDeck.setName(name);
                 newDeck.setLanguageId(selectedLanguage.getId());
+                // Якщо у вашій моделі Deck є поле userId, встановіть його:
+                // newDeck.setUserId(currentUserId);
+
                 deckService.save(newDeck);
                 dialog.close();
                 updateDecksData();
                 configureDeckLists();
-                System.out.println("Deck created. ID: " + newDeck.getId());
+                System.out.println("Deck created. ID: " + newDeck.getId() + " for user: " + currentUserId);
                 getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + newDeck.getId()));
             } else {
                 if(name == null || name.isEmpty())
@@ -225,9 +274,5 @@ public class MainView extends VerticalLayout {
         dialog.setWidth("500px");
         dialog.setHeight("350px");
         dialog.open();
-
-        /*updateDecksData();
-        configureDeckLists();*/
     }
-
 }

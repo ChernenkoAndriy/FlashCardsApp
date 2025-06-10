@@ -37,7 +37,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         cardService = service;
         this.aiService = aiService;
     }
-
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         QueryParameters params = event.getLocation().getQueryParameters();
@@ -68,7 +67,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
                     Arrays.toString(GameMode.values()), e);
         }
     }
-
     private void initialize(Integer deckId, GameMode gameMode) {
         List<Card> cards = cardService.findByDeckId(deckId);
         decksize = cards.size();
@@ -88,7 +86,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         setTask(currentTask);
         gameCard.appearNormal();
     }
-
     private void setTask(Task task) {
         if(task.getGameMode()==GameMode.SENTENCES){
             gameCard.setTask(task, task.getSentence());
@@ -101,7 +98,6 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             addButtonLayout();
         }
     }
-
     private void validateInventedSentence(String answer, Card word) {
         String chatAnswer = aiService.checkSentenceWithCardWord(word, answer);
         if (chatAnswer.contains("The sentence is correct")) {
