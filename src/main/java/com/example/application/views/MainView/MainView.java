@@ -27,6 +27,7 @@ import jakarta.annotation.security.RolesAllowed;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ public class MainView extends VerticalLayout {
     private final CardService cardService;
     private final UserService userService;
     private final SecurityService securityService;
+    private ComboBox<String> archivedSwitch = new ComboBox<>("Active switch");
 
     public MainView(DeckService deckService, LanguageService languageService,
                     CardService cardService, UserService userService, SecurityService securityService) {
@@ -59,12 +61,9 @@ public class MainView extends VerticalLayout {
         initialiseComponents();
         configureStyles();
         configureLayouts();
-
-        updateDecksData();
-        configureDeckLists();
-
         add(greeting, createHeaderLayout(), createButtonLayout(), decksAccordion);
-
+        updateDecksData(archivedSwitch.getValue());
+        configureDeckLists(archivedSwitch.getValue());
         createDeckButton.addClickListener(e -> createDeck());
     }
 
@@ -75,7 +74,6 @@ public class MainView extends VerticalLayout {
         decksByLanguage = new HashMap<>();
         decksAccordion = new Accordion();
     }
-
     private void configureStyles() {
         greeting.addClassName("banner");
         greeting.getStyle().set("font-size", "300%");
@@ -88,7 +86,6 @@ public class MainView extends VerticalLayout {
         createDeckButton.getStyle().set("margin", "0");
         decksAccordion.setWidth("90%");
     }
-
     private void configureLayouts() {
         setHeight("100%");
         setAlignItems(Alignment.CENTER);
@@ -98,18 +95,23 @@ public class MainView extends VerticalLayout {
         setSpacing(true);
         getStyle().set("padding", "2rem 3rem 0rem 3rem");
     }
-
     private HorizontalLayout createHeaderLayout() {
         HorizontalLayout headerLayout = new HorizontalLayout(allDecksTitle);
         headerLayout.setAlignItems(Alignment.BASELINE);
         headerLayout.setWidth("90%");
         return headerLayout;
     }
-
     private HorizontalLayout createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout(createDeckButton);
         buttonLayout.setWidthFull();
+        buttonLayout.addToEnd(archivedSwitch);
+        archivedSwitch.setItems("Active", "Archived");
         buttonLayout.setAlignItems(Alignment.START);
+        archivedSwitch.setAllowCustomValue(false);
+        archivedSwitch.setValue("Active");
+        archivedSwitch.addValueChangeListener(e -> {
+        updateDecksData(archivedSwitch.getValue());
+        configureDeckLists(archivedSwitch.getValue());});
         buttonLayout.getStyle()
                 .set("width", "90%")
                 .set("margin-left", "4rem");
@@ -118,10 +120,6 @@ public class MainView extends VerticalLayout {
         buttonLayout.getStyle().set("margin", "1rem 0");
         return buttonLayout;
     }
-
-    /**
-     * Отримує ID поточного авторизованого користувача
-     */
     private Integer getCurrentUserId() {
         return securityService.getAuthenticatedUser()
                 .map(userDetails -> {
@@ -130,18 +128,15 @@ public class MainView extends VerticalLayout {
                 })
                 .orElse(null);
     }
-
-    private void updateDecksData() {
+    private void updateDecksData(String value) {
         decksByLanguage.clear();
 
         Integer userId = getCurrentUserId();
         if (userId == null) {
-            // Якщо користувач не авторизований, показуємо порожній список
             System.err.println("User not authenticated!");
             return;
         }
 
-        // Логування для діагностики (можна видалити в продакшені)
         System.out.println("Current user ID: " + userId);
 
         for(Card card : cardService.findAllLearnedByUser(userId)){
@@ -156,13 +151,17 @@ public class MainView extends VerticalLayout {
         }
 
         for (Language language : languageService.findLanguagesByUserId(userId)) {
-            List<DeckDto> deckDtos = deckService.findActiveDeckDtosByUserAndLanguage(userId, language.getId());
+            List<DeckDto> deckDtos = new ArrayList<>();
+            if (value.equals("Active")) {
+                deckDtos = deckService.findActiveDeckDtosByUserAndLanguage(userId, language.getId());
+            }else {
+                deckDtos = deckService.findArchivedDeckDtosByUserAndLanguage(userId, language.getId());
+            }
             System.out.println("DECKS for language " + language.getName() + ": " + deckDtos.size());
             decksByLanguage.put(language.getName(), deckDtos);
         }
     }
-
-    private void configureDeckLists() {
+    private void configureDeckLists(String value) {
         decksAccordion.getChildren().forEach(component -> decksAccordion.remove(component));
 
         for (Map.Entry<String, List<DeckDto>> entry : decksByLanguage.entrySet()) {
@@ -175,7 +174,8 @@ public class MainView extends VerticalLayout {
             listLayout.setWidthFull();
 
             for (DeckDto deckDto : languageDecks) {
-                DequeRow row = new DequeRow(deckDto, this::deleteDeck, this::editDeck, this::playDeck, this::archiveDeck);
+                DequeRow row;
+                     row = new DequeRow(deckDto, this::deleteDeck, this::editDeck, this::playDeck, this::setActivness, value.equals("Active"));
                 listLayout.add(row);
             }
 
@@ -187,7 +187,6 @@ public class MainView extends VerticalLayout {
             panel.getElement().getStyle().set("min-height", "4rem");
         }
     }
-
     void deleteDeck(DeckDto deckDto) {
         // Додаткова перевірка безпеки - чи належить колода поточному користувачу
         Integer currentUserId = getCurrentUserId();
@@ -200,22 +199,19 @@ public class MainView extends VerticalLayout {
         // Deck deck = deckService.findById(deckDto.getId());
         // if (deck != null && deck.getUserId().equals(currentUserId)) {
         deckService.deleteByID(deckDto.getId());
-        updateDecksData();
-        configureDeckLists();
+        updateDecksData(archivedSwitch.getValue());
+        configureDeckLists(archivedSwitch.getValue());
         // }
     }
-
-    void archiveDeck(DeckDto deckDto){
+    void setActivness(DeckDto deckDto, boolean activeness){
         // Logic to set the deck as inactive
-        deckService.setDeckActiveStatus(deckDto.getId(), false); // Assuming you add this method to DeckService
-        updateDecksData();
-        configureDeckLists();
+        deckService.setDeckActiveStatus(deckDto.getId(), activeness);
+        updateDecksData(archivedSwitch.getValue());
+        configureDeckLists(archivedSwitch.getValue());
     }
-
     void editDeck(DeckDto deckDto) {
         getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + deckDto.getId()));
     }
-
     void playDeck(DeckDto deckDto, GameMode gameMode) {
         getUI().ifPresent(ui -> {
             String deckId = URLEncoder.encode(deckDto.getId().toString(), StandardCharsets.UTF_8);
@@ -223,7 +219,6 @@ public class MainView extends VerticalLayout {
             ui.navigate("game?deckId=" + deckId + "&mode=" + mode);
         });
     }
-
     void createDeck() {
         Integer currentUserId = getCurrentUserId();
         if (currentUserId == null) {
@@ -260,8 +255,8 @@ public class MainView extends VerticalLayout {
 
                 deckService.save(newDeck);
                 dialog.close();
-                updateDecksData();
-                configureDeckLists();
+                updateDecksData(archivedSwitch.getValue());
+                configureDeckLists(archivedSwitch.getValue());
                 System.out.println("Deck created. ID: " + newDeck.getId() + " for user: " + currentUserId);
                 getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + newDeck.getId()));
             } else {
