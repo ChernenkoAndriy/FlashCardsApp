@@ -124,4 +124,12 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
 
 
 
+@Query("""
+            SELECT l.name
+            FROM Card c
+            JOIN Deck d ON c.deckId = d.id
+            JOIN Language l ON d.languageId = l.id
+            WHERE c.id = :cardId
+            """)
+    String getLanguageByCard(Integer cardId);
 }

@@ -175,4 +175,8 @@ public class CardService {
         cardRepository.delete(card);
     }
 
+    public String getLanguageByCard(Card card) {
+        return cardRepository.getLanguageByCard(card.getId());
+    }
+
 }
