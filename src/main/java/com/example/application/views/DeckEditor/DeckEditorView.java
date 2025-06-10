@@ -3,8 +3,10 @@ package com.example.application.views.DeckEditor;
 import com.example.application.data.Card;
 import com.example.application.data.Deck;
 import com.example.application.dto.CardDto;
+import com.example.application.security.SecurityService;
 import com.example.application.service.CardService;
 import com.example.application.service.DeckService;
+import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -24,9 +26,12 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
     private CardService cardService;
     private final DeckService deckService;
     private Deck deck;
+    private final SecurityService securityService;
+    private final UserService userService;
+
 
     @Autowired
-    public DeckEditorView(CardService cardService, DeckService deckService) {
+    public DeckEditorView(CardService cardService, DeckService deckService, SecurityService securityService, UserService userService) {
         this.cardService = cardService;
         this.deckService = deckService;
 
@@ -39,6 +44,8 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
             cardService.delete(card);
             refreshTable();
         });
+        this.securityService = securityService;
+        this.userService = userService;
 
         configureStyle();
         configureComponents();
@@ -77,7 +84,12 @@ public class DeckEditorView extends VerticalLayout implements BeforeEnterObserve
 
     private void refreshTable() {
         if (deck != null) {
-            List<CardDto> cards = cardService.findCardDtosByUserAndDeckId(3, deck.getId()); //TODO реальний ID користувача
+            List<CardDto> cards = cardService.findCardDtosByUserAndDeckId(securityService.getAuthenticatedUser()
+                    .map(userDetails -> {
+                        com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                        return user != null ? user.getId() : null;
+                    })
+                    .orElse(null), deck.getId());
             table.setItems(cards);
         }
     }

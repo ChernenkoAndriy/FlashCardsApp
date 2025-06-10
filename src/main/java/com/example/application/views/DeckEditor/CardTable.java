@@ -42,7 +42,7 @@ public class CardTable extends Grid<CardDto> {
                 image.setHeight("40px");
                 return image;
             } else {
-                return new Span("No image");
+                return new Span("-");
             }
         })).setHeader("Image").setAutoWidth(true);
 

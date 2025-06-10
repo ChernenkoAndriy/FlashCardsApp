@@ -9,8 +9,10 @@ import com.example.application.dto.DeckDto;
 import com.example.application.repositories.DeckRepository;
 import com.example.application.repositories.UserDeckRepository;
 import com.example.application.repositories.UserProgressRepository;
+import com.example.application.security.SecurityService;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,11 +23,16 @@ public class DeckService {
 
     private final DeckRepository deckRepository;
     private final UserDeckRepository userDeckRepository;
+    private final SecurityService securityService;
+    private final UserService userService;
 
 
-    public DeckService(DeckRepository deckRepository, UserDeckRepository userDeckRepository) {
+
+    public DeckService(DeckRepository deckRepository, UserDeckRepository userDeckRepository, SecurityService securityService, UserService userService) {
         this.deckRepository = deckRepository;
         this.userDeckRepository = userDeckRepository;
+        this.securityService = securityService;
+        this.userService = userService;
     }
 
     public List<Deck> findAll() {
@@ -43,7 +50,12 @@ public class DeckService {
 
     public void save(Deck deck) {
         deckRepository.save(deck);
-        this.insertUserDeckForNewDeck(deck.getId(), 3);// TODO реальне id
+        this.insertUserDeckForNewDeck(deck.getId(), securityService.getAuthenticatedUser()
+                .map(userDetails -> {
+                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    return user != null ? user.getId() : null;
+                })
+                .orElse(null));
     }
 
     public void delete(Deck deck) {

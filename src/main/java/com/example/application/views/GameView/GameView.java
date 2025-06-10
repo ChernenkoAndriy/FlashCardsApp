@@ -1,8 +1,10 @@
 package com.example.application.views.GameView;
 
 import com.example.application.data.Card;
+import com.example.application.security.SecurityService;
 import com.example.application.service.AIService;
 import com.example.application.service.CardService;
+import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -32,10 +34,15 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private AIService aiService;
     private ButtonLayout currentButtonLayout;
     private SentenceLayout currentSentenceLayout;
+    private final SecurityService securityService;
+    private final UserService userService;
+
     @Autowired
-    public GameView(CardService service, AIService aiService) {
+    public GameView(CardService service, AIService aiService, SecurityService securityService, UserService userService) {
         cardService = service;
         this.aiService = aiService;
+        this.securityService = securityService;
+        this.userService = userService;
     }
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
@@ -113,10 +120,13 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private void taskFail() {
         bottom.removeAll();
         gameCard.flipCard();
-        /*if(currentTask.getGameMode() == GameMode.REVISION ||currentTask.getGameMode() == GameMode.DEFINITIONS) {
-            tasks.add(currentTask);
-        }*/
-        cardService.markLearning(currentTask.getCard(), 3); //TODO реальне id
+
+        cardService.markLearning(currentTask.getCard(), securityService.getAuthenticatedUser()
+                .map(userDetails -> {
+                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    return user != null ? user.getId() : null;
+                })
+                .orElse(null));
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;
@@ -135,7 +145,12 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
         if (currentTaskIndex < decksize) {
             score++;
         }
-        cardService.markGuessed(currentTask.getGameMode(), currentTask.getCard(), 3); //TODO реальне id
+        cardService.markGuessed(currentTask.getGameMode(), currentTask.getCard(), securityService.getAuthenticatedUser()
+                .map(userDetails -> {
+                    com.example.application.data.User user = userService.findByUsername(userDetails.getUsername());
+                    return user != null ? user.getId() : null;
+                })
+                .orElse(null));
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;

@@ -5,5 +5,4 @@ public enum GameMode {
     DEFINITIONS,
     SENTENCES,
     SENTENCECREATOR
-    //USAGE
 }
