@@ -82,7 +82,7 @@ public class MainView extends VerticalLayout {
     private void configureStyles() {
         greeting.addClassName("banner");
         greeting.getStyle().set("font-size", "300%");
-        greeting.getStyle().set("margin", "3rem");
+        greeting.getStyle().set("margin-top", "3rem");
         allDecksTitle.getStyle().set("margin", "0");
         createDeckButton.getStyle().set("font-size", "1.2rem");
         createDeckButton.addThemeName("primary");

@@ -31,7 +31,16 @@ public class CardTable extends Grid<CardDto> {
                 .setHeader("Word")
                 .setWidth("20%")
                 .setSortable(true);
+        addColumn(CardDto::getTranslate)
+                .setHeader("Translate")
+                .setWidth("20%")
+                .setSortable(true);
 
+        addColumn(LitRenderer.<CardDto>of(
+                        "<div style='white-space: normal;'>${item.definition}</div>")
+                .withProperty("definition", CardDto::getDefinition))
+                .setHeader("Definition")
+                .setWidth("30%");
         addColumn(new ComponentRenderer<>(card -> {
             if (card.getImage() != null && card.getImage().length > 0) {
                 Image image = new Image();
@@ -45,18 +54,6 @@ public class CardTable extends Grid<CardDto> {
                 return new Span("-");
             }
         })).setHeader("Image").setAutoWidth(true);
-
-        addColumn(CardDto::getTranslate)
-                .setHeader("Translate")
-                .setWidth("20%")
-                .setSortable(true);
-
-        addColumn(LitRenderer.<CardDto>of(
-                        "<div style='white-space: normal;'>${item.definition}</div>")
-                .withProperty("definition", CardDto::getDefinition))
-                .setHeader("Definition")
-                .setWidth("30%");
-
         addColumn(LitRenderer.<CardDto>of(
                         """
                                 <div style="position: relative; width: 30px; height: 30px;">

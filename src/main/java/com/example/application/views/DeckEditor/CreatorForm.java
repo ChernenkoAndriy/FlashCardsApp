@@ -27,16 +27,17 @@ public class CreatorForm extends VerticalLayout {
     private final TextArea definition = new TextArea("Definition");
     private final Button save = new Button("Save");
     private final Button delete = new Button("Delete");
+    private final Button deletePicture = new Button("Delete picture");
     private final Binder<Card> binder = new BeanValidationBinder<>(Card.class);
     private Card card;
-    private Upload upload; // Made non-final to allow reassignment
+    private Upload upload;
     private final MemoryBuffer buffer = new MemoryBuffer();
 
     public CreatorForm(Consumer<Card> onSave, Consumer<Card> onDelete) {
         configureBinder();
         configureLayout();
         configureFields();
-        initAndConfigureUpload(); // Initialize and configure the upload component
+        initAndConfigureUpload();
         configureButtons();
         configureListeners(onSave, onDelete);
         binder.bindInstanceFields(this);
@@ -44,10 +45,9 @@ public class CreatorForm extends VerticalLayout {
         add(word, translate, upload, definition, buttonLayout);
     }
 
-    // New method to initialize and configure the Upload component
     private void initAndConfigureUpload() {
-        upload = new Upload(); // Create a new instance
-        upload.setReceiver(buffer); // Set the receiver for the new instance
+        upload = new Upload();
+        upload.setReceiver(buffer);
         upload.setAcceptedFileTypes("image/*");
         upload.setMaxFileSize(2 * 1024 * 1024); // 2MB
 
@@ -96,8 +96,7 @@ public class CreatorForm extends VerticalLayout {
     public void setCard(Card card) {
         this.card = card;
         binder.readBean(card);
-        // When setting a new card, ensure the upload component is ready for a new upload
-        resetUploadComponent(); // This effectively clears any old file name and prepares for a new upload
+        resetUploadComponent();
     }
 
     private void configureListeners(Consumer<Card> onSave, Consumer<Card> onDelete) {
@@ -111,12 +110,8 @@ public class CreatorForm extends VerticalLayout {
                     binder.writeBean(card);
                     System.out.println("Saving card with id: " + target.getId());
                     onSave.accept(card);
-
-                    // --- RESET UPLOAD COMPONENT AFTER SAVE ---
+                    setCard(new Card());
                     resetUploadComponent();
-                    // --- END RESET ---
-
-                    setCard(new Card()); // Set a new empty card for the form
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -125,26 +120,37 @@ public class CreatorForm extends VerticalLayout {
         delete.addClickListener(event -> {
             if (card != null) {
                 onDelete.accept(card);
-                resetUploadComponent(); // Reset on delete as well
+                resetUploadComponent();
                 setCard(new Card());
             }
         });
+        deletePicture.addClickListener(event -> {
+            if (card != null) {
+                card.setImage(null);
+                card.setImageType(null);
+                if (binder.isValid()) {
+                    if (card == null) {
+                        card = new Card();
+                    }
+                    try {
+                        Card target = card;
+                        binder.writeBean(card);
+                        System.out.println("Saving card with id: " + target.getId());
+                        onSave.accept(card);
+                        setCard(new Card());
+                        resetUploadComponent();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
-
-    // New method to reset the upload component by replacing it
     private void resetUploadComponent() {
-        Upload oldUpload = this.upload; // Store reference to the old upload component
+        Upload oldUpload = this.upload;
 
-        // Clear image data on the current card before creating a new one
-        if (this.card != null) {
-            this.card.setImage(null);
-            this.card.setImageType(null);
-        }
 
-        initAndConfigureUpload(); // Create and configure a new upload component
-
-        // Replace the old upload component with the new one in the layout
-        // This will visually clear the file name and reset the progress bar
+        initAndConfigureUpload();
         replace(oldUpload, this.upload);
     }
 
@@ -170,10 +176,12 @@ public class CreatorForm extends VerticalLayout {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         save.addClickShortcut(Key.ENTER);
+        delete.addClickShortcut(Key.DELETE);
+
     }
 
     private Component createButtonsLayout() {
-        HorizontalLayout buttons = new HorizontalLayout(save, delete);
+        VerticalLayout buttons = new VerticalLayout(save, delete, deletePicture);
         buttons.setMaxWidth("400px");
         buttons.setSpacing(true);
         buttons.setPadding(false);
