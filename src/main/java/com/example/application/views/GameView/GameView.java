@@ -9,8 +9,11 @@ import com.example.application.service.CardService;
 import com.example.application.service.UserProgressService;
 import com.example.application.service.UserService;
 import com.example.application.views.Components.MainLayout;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
@@ -145,8 +148,24 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver {
             taskSuccess();
         } else {
 
-            Notification.show(chatAnswer, 8000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+            Notification notification = new Notification();
+            notification.setPosition(Notification.Position.MIDDLE);
+            notification.setDuration(0);
+
+            Span text = new Span(chatAnswer);
+            Button closeButton = new Button("Got it!", e -> notification.close());
+            closeButton.getElement().getStyle().set("margin-left", "auto");
+
+            HorizontalLayout layout = new HorizontalLayout(text, closeButton);
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            layout.setWidthFull();
+            //layout.getStyle().set("font-size", "1.2em"); // більший шрифт
+            //layout.getStyle().set("padding", "1em");     // більший відступ
+
+            notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            notification.add(layout);
+            notification.open();
+
 
             taskFail();
         }
