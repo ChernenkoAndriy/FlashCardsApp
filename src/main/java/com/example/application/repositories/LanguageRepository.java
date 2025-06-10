@@ -15,9 +15,8 @@ public interface LanguageRepository extends JpaRepository<Language, Integer> {
     @Query("""
     SELECT DISTINCT l FROM Language l
     JOIN Deck d ON d.languageId = l.id
-    JOIN Card c ON c.deckId = d.id
-    JOIN UserProgress p ON p.cardId = c.id
-    WHERE p.userId = :userId
+    JOIN UserDeck ud ON ud.deckId = d.id
+    WHERE ud.userId = :userId
     """)
     List<Language> findLanguagesByUserId(@Param("userId") Integer userId);
 }

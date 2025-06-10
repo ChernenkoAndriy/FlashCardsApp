@@ -26,6 +26,7 @@ public class DeleteButton extends MiniButton {
 
             Button confirm = new Button("Delete", e ->{
                 onDelete.accept(deckDto);
+                dialog.close();
             });
             Button cancel = new Button("Cancel", e -> dialog.close());
 

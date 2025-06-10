@@ -12,14 +12,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 @RolesAllowed({"ADMIN", "USER"})
 @Route(value = "game", layout = MainLayout.class)
 @PageTitle("Game | SLEEVE")
-public class GameView extends VerticalLayout implements BeforeEnterObserver{
+public class GameView extends VerticalLayout implements BeforeEnterObserver {
     private Queue<Task> tasks = new LinkedList<>();
     private GameCard gameCard = new GameCard();
     private final HorizontalLayout bottom = new HorizontalLayout();
@@ -38,8 +40,9 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
     @Autowired
     public GameView(CardService service, AIService aiService) {
         cardService = service;
-        this.aiService=aiService;
+        this.aiService = aiService;
     }
+
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         QueryParameters params = event.getLocation().getQueryParameters();
@@ -70,6 +73,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
                     Arrays.toString(GameMode.values()), e);
         }
     }
+
     private void initialize(Integer deckId, GameMode gameMode) {
         List<Card> cards = cardService.findByDeckId(deckId);
         decksize = cards.size();
@@ -81,8 +85,8 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
 
         gameCard.addClickListener(clickevent -> {
 
-                gameCard.flipCard();
-                handleCardFlip();
+            gameCard.flipCard();
+            handleCardFlip();
         });
 
         setTask(currentTask);
@@ -92,17 +96,17 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
     private void setTask(Task task) {
         gameCard.setTask(task);
         if (task.getGameMode() == GameMode.SENTENCES) {
-          addSentenceLayout(task);
+            addSentenceLayout(task);
         } else {
-           addButtonLayout();
+            addButtonLayout();
         }
-            }
+    }
 
-    private void validateInventedSentence(String answer, String word) {
+    private void validateInventedSentence(String answer, Card word) {
         String chatAnswer = aiService.checkSentenceWithCardWord(word, answer);
-        if(chatAnswer.contains("The sentence is correct")){
+        if (chatAnswer.contains("The sentence is correct")) {
             taskSuccess();
-        }else{
+        } else {
 
             Notification.show(chatAnswer, 8000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -116,9 +120,10 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
     private void taskFail() {
         bottom.removeAll();
         gameCard.flipCard();
-        if(currentTask.getGameMode() == GameMode.REVISION ||currentTask.getGameMode() == GameMode.DEFINITIONS) {
+        /*if(currentTask.getGameMode() == GameMode.REVISION ||currentTask.getGameMode() == GameMode.DEFINITIONS) {
             tasks.add(currentTask);
-        }
+        }*/
+        cardService.markLearning(currentTask.getCard(), 3); //TODO реальне id
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;
@@ -127,15 +132,18 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
                 setTask(currentTask);
                 bottom.setVisible(true);
             });
+        } else {
+            gameFinished();
         }
     }
 
     private void taskSuccess() {
         bottom.removeAll();
         gameCard.flipCard();
-        if(currentTaskIndex<decksize) {
+        if (currentTaskIndex < decksize) {
             score++;
         }
+        cardService.markGuessed(currentTask.getGameMode(), currentTask.getCard(), 3); //TODO реальне id
         Task nextTask = tasks.poll();
         if (nextTask != null) {
             currentTask = nextTask;
@@ -148,6 +156,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
             gameFinished();
         }
     }
+
     private void gameFinished() {
         GameFinishScreen finishedScreen = new GameFinishScreen(
                 score,
@@ -160,6 +169,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
         removeAll();
         add(finishedScreen);
     }
+
     private void setStyle() {
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);
@@ -178,6 +188,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
         bottom.setHeight("15%");
         add(bottom);
     }
+
     private void handleCardFlip() {
         if (currentTask.getGameMode() == GameMode.SENTENCES) {
 
@@ -188,7 +199,7 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
         }
     }
 
-    private void addButtonLayout(){
+    private void addButtonLayout() {
         bottom.removeAll();
         bottom.setVisible(false);
         currentButtonLayout = new ButtonLayout(v -> taskSuccess(), v -> taskFail());
@@ -198,13 +209,13 @@ public class GameView extends VerticalLayout implements BeforeEnterObserver{
         bottom.add(currentButtonLayout);
     }
 
-    private void addSentenceLayout(Task task){
+    private void addSentenceLayout(Task task) {
         bottom.removeAll();
         bottom.setVisible(false);
         currentSentenceLayout = new SentenceLayout();
         currentButtonLayout = null;
         currentSentenceLayout.getSubmit().addClickListener(clickevent -> {
-            validateInventedSentence(currentSentenceLayout.getAnswer(), task.getCard().getWord());
+            validateInventedSentence(currentSentenceLayout.getAnswer(), task.getCard());
         });
         bottom.add(currentSentenceLayout);
         bottom.setVisible(true);

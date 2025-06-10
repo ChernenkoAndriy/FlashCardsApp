@@ -1,6 +1,7 @@
 package com.example.application.views.MainView;
 
 import com.example.application.data.Card;
+import com.example.application.data.Deck;
 import com.example.application.data.Language;
 import com.example.application.dto.DeckDto;
 import com.example.application.service.CardService;
@@ -11,10 +12,14 @@ import com.example.application.views.Components.MainLayout;
 import com.example.application.views.GameView.GameMode;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
@@ -124,6 +129,7 @@ public class MainView extends VerticalLayout {
         }
         for (Language language : languageService.findLanguagesByUserId(userId)) {
             List<DeckDto> deckDtos = deckService.findActiveDeckDtosByUserAndLanguage(userId, language.getId());
+            System.out.println("DECKS: "+deckDtos.size());
             decksByLanguage.put(language.getName(), deckDtos);
         }
     }
@@ -152,14 +158,17 @@ public class MainView extends VerticalLayout {
             panel.getElement().getStyle().set("min-height", "4rem");
         }
     }
+
     void deleteDeck(DeckDto deckDto) {
         deckService.deleteByID(deckDto.getId());
         updateDecksData();
         configureDeckLists();
     }
+
     void editDeck(DeckDto deckDto) {
         getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + deckDto.getId()));
     }
+
     void playDeck(DeckDto deckDto, GameMode gameMode) {
         getUI().ifPresent(ui -> {
             String deckId = URLEncoder.encode(deckDto.getId().toString(), StandardCharsets.UTF_8);
@@ -169,7 +178,56 @@ public class MainView extends VerticalLayout {
     }
 
     void createDeck() {
-        updateDecksData();
-        configureDeckLists();
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Create New Deck");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(true);
+        layout.setSpacing(true);
+        layout.setWidth("350px");
+
+        TextField nameField = new TextField("Deck Name");
+        nameField.setWidthFull();
+
+        ComboBox<Language> languageComboBox = new ComboBox<>("Language");
+        languageComboBox.setItems(languageService.findAll());
+        languageComboBox.setItemLabelGenerator(Language::getName);
+        languageComboBox.setWidthFull();
+
+        Button createBtn = new Button("Create", event -> {
+            String name = nameField.getValue();
+            Language selectedLanguage = languageComboBox.getValue();
+
+            if (name != null && !name.isEmpty() && selectedLanguage != null) {
+                Deck newDeck = new Deck();
+                newDeck.setName(name);
+                newDeck.setLanguageId(selectedLanguage.getId());
+                deckService.save(newDeck);
+                dialog.close();
+                updateDecksData();
+                configureDeckLists();
+                System.out.println("Deck created. ID: " + newDeck.getId());
+                getUI().ifPresent(ui -> ui.navigate("editor?deckId=" + newDeck.getId()));
+            } else {
+                if(name == null || name.isEmpty())
+                    nameField.setInvalid(true);
+                if(selectedLanguage == null)
+                    languageComboBox.setInvalid(true);
+            }
+        });
+
+        createBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        layout.add(nameField, languageComboBox, createBtn);
+        layout.expand(nameField, languageComboBox, createBtn);
+
+        dialog.add(layout);
+        dialog.setWidth("500px");
+        dialog.setHeight("350px");
+        dialog.open();
+
+        /*updateDecksData();
+        configureDeckLists();*/
     }
+
 }

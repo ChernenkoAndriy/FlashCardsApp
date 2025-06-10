@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserProgressRepository extends JpaRepository<UserProgress, Integer> {
@@ -47,6 +48,11 @@ public interface UserProgressRepository extends JpaRepository<UserProgress, Inte
             WHERE up.cardId = :cardId AND up.userId = :userId
             """)
     void setLearned(Integer cardId, Integer userId);
+@Query("""
+        SELECT 1
+        FROM UserProgress up
+        WHERE up.cardId = :cardId""")
+    Optional<UserProgress> findByCardId(Integer cardId);
 
 //    public void nextStageForCardById(@Param("userId") Integer userId, @Param("cardId") Integer cardId);
 

@@ -12,10 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CardService {
@@ -93,8 +90,9 @@ public class CardService {
     public void markGuessed(GameMode gameMode, Card card, Integer userId) {
         UserProgress userProgress = userProgressRepository.findByUserIdAndCardId(userId, card.getId());
         String period = userProgress.getPeriod();
+        //TODO: update according to levels
         switch (period) {
-            case "learning":{
+            case "created", "learning":{
                 if (gameMode.equals(GameMode.REVISION)){
                     userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(1), "first");
                 } else if (gameMode.equals(GameMode.DEFINITIONS)){
@@ -122,7 +120,7 @@ public class CardService {
                 } /*else if (gameMode.equals(GameMode.USAGE)){
                     userProgressRepository.setLearned(card.getId(), userId);
                 }*/
-                //TODO коли буде режим 3
+                //TODO коли буде режим 4
                 break;
             }
             case "third":{
@@ -133,6 +131,14 @@ public class CardService {
                 break;
             }
         }
+    }
+
+    public void markLearning(Card card, Integer userId) {
+        UserProgress userProgress = userProgressRepository.findByUserIdAndCardId(userId, card.getId());
+        if(Objects.equals(userProgress.getPeriod(), "created")){
+            userProgressRepository.updatePeriod(card.getId(), userId, LocalDateTime.now().plusDays(1), "learning");
+        }
+
     }
 
     public List<CardDto> findCardDtosByUserAndDeckId(@Param("userId") Integer userId, @Param("deckId") Integer deckId){
@@ -147,7 +153,7 @@ public class CardService {
     }
 
     public void insertUserProgressForNewCard(Integer cardId, Integer deckId) {
-        Optional<Card> presentCard = cardRepository.findById(cardId);
+        Optional<UserProgress> presentCard = userProgressRepository.findByCardId(cardId);
         if (!presentCard.isPresent()) {
             List<Integer> userIds = userRepository.findUserIdsByDeckId(deckId);
 

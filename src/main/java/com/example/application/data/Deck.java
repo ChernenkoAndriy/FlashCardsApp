@@ -8,7 +8,7 @@ public class Deck {
 
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "`name`", nullable = false)
