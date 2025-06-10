@@ -30,10 +30,14 @@ public class DequeRow extends HorizontalLayout {
                     Consumer<DeckDto> onDelete,
                     Consumer<DeckDto> onEdit,
                     BiConsumer<DeckDto, GameMode> onPlay,
-                    Consumer<DeckDto> onArchive
+                    BiConsumer<DeckDto, Boolean> onArchive,
+                    boolean isActive
     ) {
         this.dequeCard = new DequeCard(deckDto);
-        initializeComponents(deckDto, onDelete, onEdit, onPlay, onArchive);
+        initializeComponents(deckDto, onDelete, onEdit, onPlay, onArchive, isActive);
+        deleteButton.setVisible(isActive);
+        editButton.setVisible(isActive);
+        playButton.setVisible(isActive);
         configureLayout();
         applyStyles();
     }
@@ -41,12 +45,12 @@ public class DequeRow extends HorizontalLayout {
     private void initializeComponents(DeckDto deckDto,
                                       Consumer<DeckDto> onDelete,
                                       Consumer<DeckDto> onEdit,
-                                      BiConsumer<DeckDto, GameMode> onPlay, Consumer<DeckDto> onArchive) {
+                                      BiConsumer<DeckDto, GameMode> onPlay, BiConsumer<DeckDto, Boolean> onArchive, boolean isActive) {
 
         deleteButton = new DeleteButton(deckDto, onDelete);
         editButton   = new EditButton(deckDto, onEdit);
         playButton   = new PlayButton(deckDto, onPlay);
-        archiveButton = new ArchiveButton(deckDto, onArchive);
+        archiveButton = new ArchiveButton(deckDto, onArchive, isActive);
 
         dequeCard.setWidth("60%");
     }
