@@ -134,9 +134,11 @@ public class CardService {
 
     private void markCardLearned(Card card, Integer userId) {
         userProgressRepository.updatePeriod(card.getId(), userId, null, "third");
-        userProgressRepository.setLearned(card.getId(), userId);
-        cardRepository.incrementLearnedNumberUser(card.getDeckId(), userId);
-        userDeckRepository.updatePercentage(card.getDeckId(), userId, 100*userDeckRepository.findUserDeckByDeckIdAndUserId(card.getDeckId(), userId).get().getLearnedNumber()/deckRepository.findDeckById(card.getDeckId()).getCardsNumber());
+        if(!userProgressRepository.findByUserIdAndCardId(userId, card.getId()).isLearned()){
+            userProgressRepository.setLearned(card.getId(), userId);
+            cardRepository.incrementLearnedNumberUser(card.getDeckId(), userId);
+            userDeckRepository.updatePercentage(card.getDeckId(), userId, 100*userDeckRepository.findUserDeckByDeckIdAndUserId(card.getDeckId(), userId).get().getLearnedNumber()/deckRepository.findDeckById(card.getDeckId()).getCardsNumber());
+        }
     }
 
     public void markLearning(Card card, Integer userId) {
