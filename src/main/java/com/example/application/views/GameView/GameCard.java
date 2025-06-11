@@ -214,19 +214,23 @@ public class GameCard extends VerticalLayout {
                 "const element = this;" +
                         "const container = element.parentElement;" +
                         "function adjustFontSize() {" +
-                        "  let fontSize = parseInt(window.getComputedStyle(element).fontSize);" +
                         "  const maxFontSize = Math.min(container.clientWidth * 0.08, 32);" +
                         "  const minFontSize = 12;" +
-                        "  fontSize = Math.min(fontSize, maxFontSize);" +
+                        "  let fontSize = minFontSize;" +
                         "  element.style.fontSize = fontSize + 'px';" +
-                        "  while ((element.scrollHeight > container.clientHeight || element.scrollWidth > container.clientWidth) && fontSize > minFontSize) {" +
-                        "    fontSize -= 1;" +
+                        "  while (fontSize < maxFontSize && element.scrollHeight <= container.clientHeight && element.scrollWidth <= container.clientWidth) {" +
+                        "    fontSize++;" +
+                        "    element.style.fontSize = fontSize + 'px';" +
+                        "  }" +
+                        "  if (element.scrollHeight > container.clientHeight || element.scrollWidth > container.clientWidth) {" +
+                        "    fontSize--;" +
                         "    element.style.fontSize = fontSize + 'px';" +
                         "  }" +
                         "}" +
                         "setTimeout(() => { adjustFontSize(); }, 100);" +
                         "window.addEventListener('resize', adjustFontSize);"
         );
+
     }
     private void setStyle() {
         getStyle().set("perspective", "1000px");
