@@ -261,10 +261,54 @@ INSERT INTO `card` (`word`, `translate`, `definition`, `image`, `deck_id`) VALUE
                                                                                ('кіт', 'whale', 'a large marine mammal', NULL, 11),
                                                                                ('лев', 'lion', 'a large wild cat known as the king of the jungle', NULL, 11),
                                                                                ('панда', 'panda', 'a bear-like animal native to China', NULL, 11),
-                                                                               ('слон', 'elephant', 'the largest land animal with a trunk', NULL, 11);
+                                                                               ('слон', 'elephant', 'the largest land animal with a trunk', NULL, 11),
 
+('friend', 'друг', 'a person whom one knows and with whom one has a bond of mutual affection', NULL, 7),
+       ('family', 'родина', 'a group consisting of parents and children living together in a household', NULL, 7),
+       ('house', 'будинок', 'a building for human habitation', NULL, 7),
+       ('school', 'школа', 'an institution for educating children', NULL, 7),
+       ('teacher', 'вчитель', 'a person who teaches', NULL, 7),
+       ('student', 'студент', 'a person who is studying at a school or college', NULL, 7),
+       ('city', 'місто', 'a large town', NULL, 7),
+       ('country', 'країна', 'a nation or state', NULL, 7),
+       ('travel', 'подорожувати', 'make a journey, typically of some length', NULL, 7),
+       ('learn', 'вчити', 'gain or acquire knowledge of or skill in', NULL, 7),
+ ('Apfel', 'яблуко', 'eine runde Frucht mit süßem Geschmack', NULL, 9),
+       ('Buch', 'книга', 'ein Werk mit geschriebenen oder gedruckten Seiten', NULL, 9),
+       ('Wasser', 'вода', 'eine farblose, durchsichtige Flüssigkeit, die zum Leben notwendig ist', NULL, 9),
+       ('Essen', 'їжа', 'Substanz, die zur Ernährung dient', NULL, 9),
+       ('trinken', 'пити', 'Flüssigkeit zu sich nehmen', NULL, 9),
+       ('gehen', 'йти', 'sich zu Fuß fortbewegen', NULL, 9),
+       ('lesen', 'читати', 'geschriebene oder gedruckte Texte verstehen', NULL, 9),
+       ('sprechen', 'говорити', 'Wörter und Sätze äußern', NULL, 9),
+       ('schreiben', 'писати', 'Buchstaben oder Zeichen auf einer Oberfläche anbringen', NULL, 9),
+       ('Tag', 'день', 'die Zeitspanne von Sonnenaufgang bis Sonnenuntergang', NULL, 9);
+
+
+-- User Progress for Diana (user_id = 2) for the newly added cards
 INSERT INTO `user_progress` (`user_id`, `card_id`, `period`, `is_correct`, `next_date`, `is_learned`)
-VALUES
+VALUES (2, 55, 'created', 0, NULL, 0), -- friend (deck 7)
+       (2, 56, 'created', 0, NULL, 0), -- family (deck 7)
+       (2, 57, 'created', 0, NULL, 0), -- house (deck 7)
+       (2, 58, 'created', 0, NULL, 0), -- school (deck 7)
+       (2, 59, 'created', 0, NULL, 0), -- teacher (deck 7)
+       (2, 60, 'created', 0, NULL, 0), -- student (deck 7)
+       (2, 61, 'created', 0, NULL, 0), -- city (deck 7)
+       (2, 62, 'created', 0, NULL, 0), -- country (deck 7)
+       (2, 63, 'created', 0, NULL, 0), -- travel (deck 7)
+       (2, 64, 'created', 0, NULL, 0), -- learn (deck 7)
+       (2, 65, 'created', 0, NULL, 0), -- Apfel (deck 9)
+       (2, 66, 'created', 0, NULL, 0), -- Buch (deck 9)
+       (2, 67, 'created', 0, NULL, 0), -- Wasser (deck 9)
+       (2, 68, 'created', 0, NULL, 0), -- Essen (deck 9)
+       (2, 69, 'created', 0, NULL, 0), -- trinken (deck 9)
+       (2, 70, 'created', 0, NULL, 0), -- gehen (deck 9)
+       (2, 71, 'created', 0, NULL, 0), -- lesen (deck 9)
+       (2, 72, 'created', 0, NULL, 0), -- sprechen (deck 9)
+       (2, 73, 'created', 0, NULL, 0), -- schreiben (deck 9)
+       (2, 74, 'created', 0, NULL, 0), -- Tag (deck 9)
+
+
     (1, 1, 'created', 0, NULL, 1),
     (1, 2, 'created', 0, NULL, 1),
     (1, 3, 'created', 0, NULL, 1),
