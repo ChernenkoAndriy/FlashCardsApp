@@ -47,17 +47,17 @@ vaadin-button:hover {
     white-space: nowrap;
     letter-spacing: 0.05em;
     max-width: 30ch;
+    width: 0ch;
 
     animation:
-            typing 3.5s steps(40, end) forwards,
+            typing 3.5s steps(30, end) forwards,
             blink-caret 0.75s step-end 4,
             remove-caret 3.5s forwards;
 }
 
-/* Ефект друку */
 @keyframes typing {
-    from { width: 0 }
-    to { width: 100% }
+    from { width: 0ch; }
+    to { width: 30ch; }
 }
 
 /* Блимання курсора */

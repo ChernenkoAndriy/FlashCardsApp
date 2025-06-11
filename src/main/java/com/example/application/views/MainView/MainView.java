@@ -71,7 +71,7 @@ public class MainView extends VerticalLayout {
     }
 
     private void initialiseComponents() {
-        greeting = new H1("Welcome, ! Let`s learn some words!");
+        greeting = new H1("Welcome, let's learn some words!");
         allDecksTitle = new H2("All Decks");
         createDeckButton = new Button("Create new deck");
         decksByLanguage = new HashMap<>();
@@ -83,6 +83,7 @@ public class MainView extends VerticalLayout {
         greeting.addClassName("banner");
         greeting.getStyle().set("font-size", "300%");
         greeting.getStyle().set("margin-top", "3rem");
+        greeting.getStyle().set("width", "850px");
         allDecksTitle.getStyle().set("margin", "0");
         createDeckButton.getStyle().set("font-size", "1.2rem");
         createDeckButton.addThemeName("primary");
